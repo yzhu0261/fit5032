@@ -9,6 +9,9 @@ const password = ref('')
 const emailError = ref('')
 const passwordError = ref('')
 
+// Store success message when successfully register.
+const successMessage = ref('')
+
 // email must be like string@string.string
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -17,6 +20,7 @@ const validateForm = () =>
 {
   emailError.value = ''
   passwordError.value = ''
+  successMessage.value = ''
 
   if (email.value === '') 
   {
@@ -39,6 +43,7 @@ const validateForm = () =>
   if (emailError.value === '' && passwordError.value ==='')
   {
     localStorage.setItem('registeredEmail', email.value)
+    successMessage.value = 'Successfully register'
   }
 }
 
@@ -91,6 +96,10 @@ if (savedEmail)
       <button type="submit" class="btn btn-success">
         Register
       </button>
+
+      <p v-if = "successMessage" class = text-success mt3>
+        {{ successMessage }}
+      </p>
     </form>
   </main>
 </template>
