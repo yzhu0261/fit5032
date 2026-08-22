@@ -1,15 +1,19 @@
 <script setup>
+// Import RouterLink for navigation & RouteView for displaying.
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
   <header>
+    <!-- Bootstrap responsive navigation bar. -->
     <nav class="navbar navbar-expand-lg bg-light">
       <div class="container">
+        <!-- When user click the website name, the web will return the user to the Home page. -->
         <RouterLink class="navbar-brand" to="/">
           GreenUp Melbourne
         </RouterLink>
 
+        <!-- This button will appear on a smaller screens for opening and closing the navigation menu. -->
         <button
           class="navbar-toggler"
           type="button"
@@ -22,6 +26,7 @@ import { RouterLink, RouterView } from 'vue-router'
           <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- ms-auto will move the links to the right side of the page. -->
         <div class="collapse navbar-collapse" id="mainNavbar">
           <div class="navbar-nav ms-auto">
             <RouterLink class="nav-link" to="/">Home</RouterLink>
@@ -36,7 +41,8 @@ import { RouterLink, RouterView } from 'vue-router'
     </nav>
   </header>
 
-  <RouterView />
+  <!-- Displays the current page(flex-grow-1 ensures the footer will always be at the bottom). -->
+  <RouterView class="flex-grow-1" />
 
 <footer class="bg-success text-white mt-5 py-4">
   <div class="container">
@@ -45,6 +51,7 @@ import { RouterLink, RouterView } from 'vue-router'
         <p class="mb-0">© 2026 GreenUp Melbourne</p>
       </div>
 
+      <!-- footer links move to the right side of the page on a medium or large screen.-->
       <div class="col-12 col-md-6 text-md-end">
         <RouterLink class="text-white me-3" to="/">Home</RouterLink>
         <RouterLink class="text-white me-3" to="/explore">Explore</RouterLink>
