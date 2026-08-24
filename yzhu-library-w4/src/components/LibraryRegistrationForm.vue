@@ -2,71 +2,35 @@
   <div class="container mt-5">
     <div class="row">
       <div class="col-12 col-md-8 offset-md-2">
-        <h1 class="text-center">User Information Form</h1>
+        <h1 class="text-center">🗄️ W5. Library Registration Form</h1>
 
         <form @submit.prevent="submitForm">
-          <!-- Username and Password -->
-        <div class="row mb-3">
 
-          <div class="col-12 col-sm-6">
-            <label for="username" class="form-label">Username</label>
-
-            <input
-              type="text"
-              class="form-control"
-              id="username"
-              @blur="() => validateName(true)"
-              @input="() => validateName(false)"
-              v-model="formData.username"
-            />
-
-            <div v-if="errors.username" class="text-danger">
-              {{ errors.username }}
-            </div>
-          </div>
-
-          <div class="col-12 col-sm-6">
-            <label for="password" class="form-label">Password</label>
-
-            <input
-              type="password"
-              class="form-control"
-              id="password"
-              @blur="() => validatePassword(true)"
-              @input="() => validatePassword(false)"
-              v-model="formData.password"
-            />
-
-            <div v-if="errors.password" class="text-danger">
-              {{ errors.password }}
-            </div>
-          </div>
-
-        </div>
-
-          <!-- Australian Resident and Gender -->
+          <!-- Username and Gender -->
           <div class="row mb-3">
-            <div class="col-12 col-sm-6">
-              <div class="form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="isAustralian"
-                  @change="() => validateResident(true)"
-                  v-model="formData.isAustralian"
-                />
-                <label class="form-check-label" for="isAustralian">
-                  Australian Resident?
-                </label>
 
-                <div v-if="errors.resident" class="text-danger">
-                  {{ errors.resident }}
-                </div>
+            <!-- Username -->
+            <div class="col-12 col-sm-6">
+              <label for="username" class="form-label">Username</label>
+
+              <input
+                type="text"
+                class="form-control"
+                id="username"
+                @blur="() => validateName(true)"
+                @input="() => validateName(false)"
+                v-model="formData.username"
+              />
+
+              <div v-if="errors.username" class="text-danger">
+                {{ errors.username }}
               </div>
             </div>
 
+            <!-- Gender -->
             <div class="col-12 col-sm-6">
               <label for="gender" class="form-label">Gender</label>
+
               <select
                 class="form-select"
                 id="gender"
@@ -81,6 +45,72 @@
 
               <div v-if="errors.gender" class="text-danger">
                 {{ errors.gender }}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Password and Confirm Password -->
+          <div class="row mb-3">
+
+            <!-- Password -->
+            <div class="col-12 col-sm-6">
+              <label for="password" class="form-label">Password</label>
+
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                @blur="() => validatePassword(true)"
+                @input="() => validatePassword(false)"
+                v-model="formData.password"
+              />
+
+              <div v-if="errors.password" class="text-danger">
+                {{ errors.password }}
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="col-12 col-sm-6">
+              <label for="confirm-password" class="form-label">
+                Confirm password
+              </label>
+
+              <input
+                type="password"
+                class="form-control"
+                id="confirm-password"
+                v-model="formData.confirmPassword"
+                @blur="() => validateConfirmPassword(true)"
+              />
+
+              <div v-if="errors.confirmPassword" class="text-danger">
+                {{ errors.confirmPassword }}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Australian Resident -->
+          <div class="row mb-3">
+            <div class="col-12 col-sm-6">
+              <div class="form-check">
+                <input
+                  type="checkbox"
+                  class="form-check-input"
+                  id="isAustralian"
+                  @change="() => validateResident(true)"
+                  v-model="formData.isAustralian"
+                />
+
+                <label class="form-check-label" for="isAustralian">
+                  Australian Resident?
+                </label>
+
+                <div v-if="errors.resident" class="text-danger">
+                  {{ errors.resident }}
+                </div>
               </div>
             </div>
           </div>
@@ -103,7 +133,23 @@
             <div v-if="errors.reason" class="text-danger">
               {{ errors.reason }}
             </div>
+
+            <div v-if="reasonMessage" class="text-success">
+              {{ reasonMessage }}
+            </div>
           </div>
+
+          <!-- Suburb -->
+            <div class="mb-3">
+              <label for="suburb" class="form-label">Suburb</label>
+
+              <input
+                type="text"
+                class="form-control"
+                id="suburb"
+                v-bind:value="formData.suburb"
+              />
+            </div>
 
           <!-- Buttons -->
           <div class="text-center">
@@ -119,20 +165,22 @@
               Clear
             </button>
           </div>
+
         </form>
 
         <!-- Submitted User Information DataTable -->
         <DataTable
-        v-if="submittedCards.length"
-        :value="submittedCards"
-        class="mt-5"
-      >
-        <Column field="username" header="Username"></Column>
-        <Column field="password" header="Password"></Column>
-        <Column field="isAustralian" header="Australian Resident"></Column>
-        <Column field="gender" header="Gender"></Column>
-        <Column field="reason" header="Reason"></Column>
-      </DataTable>
+          v-if="submittedCards.length"
+          :value="submittedCards"
+          class="mt-5"
+        >
+          <Column field="username" header="Username"></Column>
+          <Column field="password" header="Password"></Column>
+          <Column field="isAustralian" header="Australian Resident"></Column>
+          <Column field="gender" header="Gender"></Column>
+          <Column field="reason" header="Reason"></Column>
+        </DataTable>
+
       </div>
     </div>
   </div>
@@ -143,108 +191,158 @@ import { ref } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
+const reasonMessage = ref('')
+
 const formData = ref({
   username: '',
   password: '',
+  confirmPassword: '',
   isAustralian: false,
   reason: '',
-  gender: ''
+  gender: '',
+  suburb: 'Clayton'
 })
 
 const submittedCards = ref([])
 
+const errors = ref({
+  username: null,
+  password: null,
+  confirmPassword: null,
+  resident: null,
+  gender: null,
+  reason: null
+})
+
 const submitForm = () => {
-  validateName(true);
-  validatePassword(true);
-  validateResident(true);
-  validateGender(true);
-  validateReason(true);
+  validateName(true)
+  validatePassword(true)
+  validateConfirmPassword(true)
+  validateResident(true)
+  validateGender(true)
+  validateReason(true)
 
   if (
     !errors.value.username &&
     !errors.value.password &&
+    !errors.value.confirmPassword &&
     !errors.value.resident &&
     !errors.value.gender &&
     !errors.value.reason
   ) {
-    submittedCards.value.push({ ...formData.value });
-    clearForm();
+    submittedCards.value.push({ ...formData.value })
+    clearForm()
   }
-};
+}
 
 const clearForm = () => {
   formData.value = {
     username: '',
     password: '',
+    confirmPassword: '',
     isAustralian: false,
     reason: '',
-    gender: ''
+    gender: '',
+    suburb: 'Clayton'
   }
 }
 
-const errors = ref({
-  username: null,
-  password: null,
-  resident: null,
-  gender: null,
-  reason: null,
-});
-
 const validateName = (blur) => {
   if (formData.value.username.length < 3) {
-    if (blur) errors.value.username = "Name must be at least 3 characters";
+    if (blur) errors.value.username = 'Name must be at least 3 characters'
   } else {
-    errors.value.username = null;
+    errors.value.username = null
   }
-};
+}
 
 const validatePassword = (blur) => {
-  const password = formData.value.password;
-  const minLength = 8;
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasLowercase = /[a-z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const password = formData.value.password
+  const minLength = 8
+  const hasUppercase = /[A-Z]/.test(password)
+  const hasLowercase = /[a-z]/.test(password)
+  const hasNumber = /\d/.test(password)
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
 
   if (password.length < minLength) {
-    if (blur) errors.value.password = `Password must be at least ${minLength} characters long.`;
+    if (blur) {
+      errors.value.password =
+        `Password must be at least ${minLength} characters long.`
+    }
   } else if (!hasUppercase) {
-    if (blur) errors.value.password = "Password must contain at least one uppercase letter.";
+    if (blur) {
+      errors.value.password =
+        'Password must contain at least one uppercase letter.'
+    }
   } else if (!hasLowercase) {
-    if (blur) errors.value.password = "Password must contain at least one lowercase letter.";
+    if (blur) {
+      errors.value.password =
+        'Password must contain at least one lowercase letter.'
+    }
   } else if (!hasNumber) {
-    if (blur) errors.value.password = "Password must contain at least one number.";
+    if (blur) {
+      errors.value.password =
+        'Password must contain at least one number.'
+    }
   } else if (!hasSpecialChar) {
-    if (blur) errors.value.password = "Password must contain at least one special character.";
+    if (blur) {
+      errors.value.password =
+        'Password must contain at least one special character.'
+    }
   } else {
-    errors.value.password = null;
+    errors.value.password = null
   }
-};
+}
+
+// Validate that both password fields contain the same value
+const validateConfirmPassword = (blur) => {
+  if (formData.value.password !== formData.value.confirmPassword) {
+    if (blur) {
+      errors.value.confirmPassword = 'Passwords do not match.'
+    }
+  } else {
+    errors.value.confirmPassword = null
+  }
+}
 
 const validateResident = (blur) => {
   if (!formData.value.isAustralian) {
-    if (blur) errors.value.resident = "Please confirm Australian residency.";
+    if (blur) {
+      errors.value.resident = 'Please confirm Australian residency.'
+    }
   } else {
-    errors.value.resident = null;
+    errors.value.resident = null
   }
-};
+}
 
 const validateGender = (blur) => {
   if (!formData.value.gender) {
-    if (blur) errors.value.gender = "Please select a gender.";
+    if (blur) {
+      errors.value.gender = 'Please select a gender.'
+    }
   } else {
-    errors.value.gender = null;
+    errors.value.gender = null
   }
-};
+}
 
 const validateReason = (blur) => {
-  if (formData.value.reason.trim().length < 10) {
-    if (blur) errors.value.reason = "Reason must be at least 10 characters.";
-  } else {
-    errors.value.reason = null;
-  }
-};
+  const reason = formData.value.reason
 
+  if (reason.trim().length < 10) {
+    reasonMessage.value = ''
+
+    if (blur) {
+      errors.value.reason = 'Reason must be at least 10 characters.'
+    }
+  } else {
+    errors.value.reason = null
+
+    if (reason.toLowerCase().includes('friend')) {
+      reasonMessage.value = 'Great to have a friend'
+    } else {
+      reasonMessage.value = ''
+    }
+  }
+}
 </script>
 
 <style scoped>
