@@ -1,7 +1,7 @@
 <template>
   <main class="container py-5">
     <h1>Biodiversity & Resources</h1>
-    <p>Learn more about Melbourne's biodiversity and how you can help protect the local ecosystems.</p>
+    <p>Learn more about Melbourne's biodiversity and find out how you can help protect the local ecosystems.</p>
 
     <div class="row mt-4">
       <div class="col-12 col-md-6 col-lg-4 mb-4">
