@@ -16,7 +16,7 @@ const filteredAct = computed(() =>
   )
 })
 
-// Store environmental actibity information.
+// Store environmental activity information.
 const activities = [
   {
     id: 1,
