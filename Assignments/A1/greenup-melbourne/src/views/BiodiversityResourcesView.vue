@@ -1,3 +1,4 @@
+// This is a page helps users to learn more about biodiversity and resources.
 <template>
   <main class="container py-5">
     <h1>Biodiversity & Resources</h1>

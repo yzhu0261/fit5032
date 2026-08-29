@@ -1,3 +1,4 @@
+// This is a page illustrates our goal.
 <template>
   <main class="container py-5">
     <h1>About Us</h1>

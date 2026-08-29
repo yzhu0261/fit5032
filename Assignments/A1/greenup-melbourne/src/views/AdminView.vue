@@ -1,3 +1,4 @@
+// This is a page helps adminstractors to manage activities.
 <template>
   <main class="container py-5">
     <h1>Admin</h1>

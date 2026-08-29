@@ -1,20 +1,8 @@
+// This is a page helps users to find a suitable activity.
 <script setup>
 import { ref, computed } from 'vue'
 // Store the activity type
 const selectedType = ref('All')
-
-// Filter activities according to the type selected by the user.
-const filteredAct = computed(() => 
-{
-  if (selectedType.value === 'All') 
-  {
-    return activities
-  }
-
-  return activities.filter(
-    activity => activity.type === selectedType.value
-  )
-})
 
 // Store environmental activity information.
 const activities = [
@@ -40,6 +28,20 @@ const activities = [
     type: 'Restoration'
   },
 ]
+
+// Filter activities according to the type selected by the user.
+const filteredAct = computed(() => 
+{
+  if (selectedType.value === 'All') 
+  {
+    return activities
+  }
+
+  return activities.filter(
+    activity => activity.type === selectedType.value
+  )
+})
+
 </script>
 
 <template>

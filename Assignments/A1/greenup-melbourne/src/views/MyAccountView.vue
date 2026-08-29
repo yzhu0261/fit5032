@@ -1,3 +1,4 @@
+// This is a page help users to manage their accounts.
 <script setup>
 import { ref } from 'vue'
 
@@ -60,7 +61,7 @@ if (savedEmail)
     <h1>My Account</h1>
     <p>Create an account to join GreenUp Melbourne activities.</p>
 
-    <form class="mt-4" @submit.prevent="validateForm">
+    <form class="mt-4" @submit.prevent="validateForm" novalidate>
       <div class="mb-3">
         <label for="email" class="form-label">Email Address</label>
 

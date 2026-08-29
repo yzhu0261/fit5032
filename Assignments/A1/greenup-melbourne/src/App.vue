@@ -66,15 +66,18 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style scoped>
-header {
+header 
+{
   padding: 20px
 }
 
-nav {
+nav 
+{
   margin-top: 10px;
 }
 
-nav a {
+nav a 
+{
   margin-right: 20px;
 }
 
