@@ -6,7 +6,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <template>
   <header>
     <!-- Bootstrap responsive navigation bar. -->
-    <nav class="navbar navbar-expand-lg bg-light">
+    <nav class="navbar navbar-expand-lg bg-light position-relative">
       <div class="container">
         <!-- When user click the website name, the web will return the user to the Home page. -->
         <RouterLink class="navbar-brand" to="/">
@@ -34,7 +34,6 @@ import { RouterLink, RouterView } from 'vue-router'
             <RouterLink class="nav-link" to="/biodiversity-resources">Biodiversity & Resources</RouterLink>
             <RouterLink class="nav-link" to="/about">About Us</RouterLink>
             <RouterLink class="nav-link" to="/my-account">My Account</RouterLink>
-            <RouterLink class="nav-link" to="/admin">Admin</RouterLink>
           </div>
         </div>
       </div>
@@ -46,39 +45,41 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <footer class="bg-success text-white mt-5 py-4">
   <div class="container">
-    <div class="row align-items-center">
-      <div class="col-12 col-md-6">
-        <p class="mb-0">© 2026 GreenUp Melbourne</p>
-      </div>
+    <p class="mb-2">© 2026 GreenUp Melbourne</p>
 
-      <!-- footer links move to the right side of the page on a medium or large screen.-->
-      <div class="col-12 col-md-6 text-md-end">
-        <RouterLink class="text-white me-3" to="/">Home</RouterLink>
-        <RouterLink class="text-white me-3" to="/explore">Explore</RouterLink>
-        <RouterLink class="text-white me-3" to="/biodiversity-resources">Biodiversity & Resources</RouterLink>
-        <RouterLink class="text-white me-3" to="/about">About Us</RouterLink>
-        <RouterLink class="text-white me-3" to="/my-account">My Account</RouterLink>
-        <RouterLink class="text-white" to="/admin">Admin</RouterLink>
-      </div>
+    <div class="footer-links">
+      <RouterLink class="text-white me-3" to="/">Home</RouterLink>
+      <RouterLink class="text-white me-3" to="/explore">Explore</RouterLink>
+      <RouterLink class="text-white me-3" to="/biodiversity-resources">
+        Biodiversity & Resources
+      </RouterLink>
+      <RouterLink class="text-white me-3" to="/about">About Us</RouterLink>
+      <RouterLink class="text-white me-3" to="/my-account">My Account</RouterLink>
     </div>
   </div>
 </footer>
 </template>
 
 <style scoped>
-header 
-{
-  padding: 20px
-}
-
-nav 
-{
-  margin-top: 10px;
-}
-
 nav a 
 {
   margin-right: 20px;
 }
 
+.footer-links a {
+  white-space: nowrap;
+}
+
+/* Keep the page content in place when open the hamburger menu. */
+@media (max-width: 991.98px) {
+  #mainNavbar {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #f8f9fa;
+    padding: 10px 20px;
+    z-index: 1000;
+  }
+}
 </style>

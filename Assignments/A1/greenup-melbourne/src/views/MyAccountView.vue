@@ -16,43 +16,51 @@ const successMessage = ref('')
 // email must be like string@string.string
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Prompts relative error information.
-const validateForm = () => 
-{
+// Validate email when the user leaves the email input.
+const validateEmail = () => {
   emailError.value = ''
-  passwordError.value = ''
-  successMessage.value = ''
 
-  if (email.value === '') 
-  {
+  if (email.value === '') {
     emailError.value = 'Email is required.'
-  }
-  else if (!emailPattern.test(email.value))
-  {
+  } else if (!emailPattern.test(email.value)) {
     emailError.value = 'Invalid email address.'
-  }
-
-  if (password.value === '') 
-  {
-    passwordError.value = 'Password is required.'
-  }
-  else if (password.value.length < 8)
-  {
-    passwordError.value = 'Password must be at least 8 characters.'
-  }
-
-  if (emailError.value === '' && passwordError.value ==='')
-  {
-    localStorage.setItem('registeredEmail', email.value)
-    successMessage.value = 'Successfully register'
   }
 }
 
-// The web will keep the input email even if the web is refreshed.
-const savedEmail = localStorage.getItem('registeredEmail')
-if (savedEmail)
-{
-  email.value = savedEmail
+// Validate password when the user leaves the password input.
+const validatePassword = () => {
+  passwordError.value = ''
+
+  if (password.value === '') {
+    passwordError.value = 'Password is required.'
+  } else if (password.value.length < 8) {
+    passwordError.value = 'Password must be at least 8 characters.'
+  }
+}
+
+// Prompts relative error information.
+const validateForm = () => {
+
+  successMessage.value = ''
+
+  validateEmail()
+
+  validatePassword()
+
+  if (emailError.value === '' && passwordError.value === '') {
+
+    const user = {
+      email: email.value,
+      password: password.value,
+      role: 'user'
+    }
+
+    localStorage.setItem('registeredUser', JSON.stringify(user))
+
+    successMessage.value = 'Registration successful!'
+
+  }
+
 }
 </script>
 
@@ -61,46 +69,52 @@ if (savedEmail)
     <h1>My Account</h1>
     <p>Create an account to join GreenUp Melbourne activities.</p>
 
-    <form class="mt-4" @submit.prevent="validateForm" novalidate>
-      <div class="mb-3">
-        <label for="email" class="form-label">Email Address</label>
+    <div class="row">
+      <div class="col-12 col-md-8 col-lg-6">
+        <form class="mt-4" @submit.prevent="validateForm" novalidate>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
 
-        <!-- v-model will create a 2-way binding between the input and the email. -->
-        <input
-          id="email"
-          v-model="email"
-          type="email"
-          class="form-control"
-        />
+            <!-- v-model creates a two-way binding between the input and email. -->
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              class="form-control"
+              @blur="validateEmail"
+            />
 
-        <p v-if="emailError" class="text-danger mt-1">
-          {{ emailError }}
-        </p>
+            <p v-if="emailError" class="text-danger mt-1">
+              {{ emailError }}
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+
+            <!-- Bind the input to the password. -->
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              class="form-control"
+              @blur="validatePassword"
+            />
+
+            <p v-if="passwordError" class="text-danger mt-1">
+              {{ passwordError }}
+            </p>
+          </div>
+
+          <button type="submit" class="btn btn-success">
+            Register
+          </button>
+
+          <p v-if="successMessage" class="text-success mt-3">
+            {{ successMessage }}
+          </p>
+        </form>
       </div>
-
-      <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-
-        <!-- Bind the input to the password. -->
-        <input
-          id="password"
-          v-model="password"
-          type="password"
-          class="form-control"
-        />
-
-        <p v-if="passwordError" class="text-danger mt-1">
-          {{ passwordError }}
-        </p>
-      </div>
-
-      <button type="submit" class="btn btn-success">
-        Register
-      </button>
-
-      <p v-if = "successMessage" class = text-success mt3>
-        {{ successMessage }}
-      </p>
-    </form>
+    </div>
   </main>
 </template>
