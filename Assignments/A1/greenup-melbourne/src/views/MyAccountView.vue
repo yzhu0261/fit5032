@@ -30,6 +30,16 @@ const loginMessage = ref('')
 
 const accountMode = ref('login')
 
+const currentUser = ref(null)
+
+const savedCurrentUser = localStorage.getItem('currentUser')
+
+if (savedCurrentUser) {
+
+  currentUser.value = JSON.parse(savedCurrentUser)
+
+}
+
 // email must be like string@string.string
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -123,6 +133,8 @@ const login = () => {
 
     localStorage.setItem('currentUser', JSON.stringify(user))
 
+    currentUser.value = user
+
     loginMessage.value = 'Login successful!'
 
   } else {
@@ -130,6 +142,20 @@ const login = () => {
     loginMessage.value = 'Invalid email or password.'
 
   }
+
+}
+
+const logout = () => {
+
+  localStorage.removeItem('currentUser')
+
+  currentUser.value = null
+
+  loginEmail.value = ''
+
+  loginPassword.value = ''
+
+  loginMessage.value = ''
 
 }
 
@@ -147,124 +173,146 @@ const login = () => {
 
       <div class="col-12 col-md-8 col-lg-6">
 
-        <div class="mb-4">
+        <div v-if="!currentUser">
 
-          <button
-            type="button"
-            class="btn btn-outline-success me-2"
-            @click="accountMode = 'login'"
-          >
-            Login
-          </button>
+          <div class="mb-4">
 
-          <button
-            type="button"
-            class="btn btn-outline-success"
-            @click="accountMode = 'register'"
-          >
-            Register
-          </button>
+            <button
+              type="button"
+              class="btn btn-outline-success me-2"
+              @click="accountMode = 'login'"
+            >
+              Login
+            </button>
 
-        </div>
-
-        <form
-          v-if="accountMode === 'register'"
-          class="mt-4"
-          @submit.prevent="validateForm"
-          novalidate
-        >
-
-          <div class="mb-3">
-
-            <label for="email" class="form-label">Email Address</label>
-
-            <!-- v-model creates a two-way binding between the input and email. -->
-
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              class="form-control"
-              @blur="validateEmail"
-            />
-
-            <p v-if="emailError" class="text-danger mt-1">
-              {{ emailError }}
-            </p>
+            <button
+              type="button"
+              class="btn btn-outline-success"
+              @click="accountMode = 'register'"
+            >
+              Register
+            </button>
 
           </div>
 
-          <div class="mb-3">
-
-            <label for="password" class="form-label">Password</label>
-
-            <!-- Bind the input to the password. -->
-
-            <input
-              id="password"
-              v-model="password"
-              type="password"
-              class="form-control"
-              @blur="validatePassword"
-            />
-
-            <p v-if="passwordError" class="text-danger mt-1">
-              {{ passwordError }}
-            </p>
-
-          </div>
-
-          <button type="submit" class="btn btn-success">
-            Register
-          </button>
-
-          <p v-if="successMessage" class="text-success mt-3">
-            {{ successMessage }}
-          </p>
-
-        </form>
-
-        <div v-if="accountMode === 'login'">
-
-          <h2>Login</h2>
-
-          <form class="mt-4" @submit.prevent="login">
+          <form
+            v-if="accountMode === 'register'"
+            class="mt-4"
+            @submit.prevent="validateForm"
+            novalidate
+          >
 
             <div class="mb-3">
 
-              <label for="loginEmail" class="form-label">Email Address</label>
+              <label for="email" class="form-label">Email Address</label>
+
+              <!-- v-model creates a two-way binding between the input and email. -->
 
               <input
-                id="loginEmail"
-                v-model="loginEmail"
+                id="email"
+                v-model="email"
                 type="email"
                 class="form-control"
+                @blur="validateEmail"
               />
+
+              <p v-if="emailError" class="text-danger mt-1">
+                {{ emailError }}
+              </p>
 
             </div>
 
             <div class="mb-3">
 
-              <label for="loginPassword" class="form-label">Password</label>
+              <label for="password" class="form-label">Password</label>
+
+              <!-- Bind the input to the password. -->
 
               <input
-                id="loginPassword"
-                v-model="loginPassword"
+                id="password"
+                v-model="password"
                 type="password"
                 class="form-control"
+                @blur="validatePassword"
               />
+
+              <p v-if="passwordError" class="text-danger mt-1">
+                {{ passwordError }}
+              </p>
 
             </div>
 
             <button type="submit" class="btn btn-success">
-              Login
+              Register
             </button>
 
-            <p v-if="loginMessage" class="mt-3">
-              {{ loginMessage }}
+            <p v-if="successMessage" class="text-success mt-3">
+              {{ successMessage }}
             </p>
 
           </form>
+
+          <div v-if="accountMode === 'login'">
+
+            <h2>Login</h2>
+
+            <form class="mt-4" @submit.prevent="login">
+
+              <div class="mb-3">
+
+                <label for="loginEmail" class="form-label">Email Address</label>
+
+                <input
+                  id="loginEmail"
+                  v-model="loginEmail"
+                  type="email"
+                  class="form-control"
+                />
+
+              </div>
+
+              <div class="mb-3">
+
+                <label for="loginPassword" class="form-label">Password</label>
+
+                <input
+                  id="loginPassword"
+                  v-model="loginPassword"
+                  type="password"
+                  class="form-control"
+                />
+
+              </div>
+
+              <button type="submit" class="btn btn-success">
+                Login
+              </button>
+
+              <p v-if="loginMessage" class="mt-3">
+                {{ loginMessage }}
+              </p>
+
+            </form>
+
+          </div>
+
+        </div>
+
+        <div v-else>
+
+          <h2>Welcome</h2>
+
+          <p>{{ currentUser.email }}</p>
+
+          <p>Role: {{ currentUser.role }}</p>
+
+          <button
+            type="button"
+            class="btn btn-success"
+            @click="logout"
+          >
+            Logout
+          </button>
 
         </div>
 
