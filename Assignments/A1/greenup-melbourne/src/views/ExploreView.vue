@@ -29,6 +29,26 @@ const activities = [
   },
 ]
 
+// Store the ratings.
+const ratings = ref({})
+
+activities.forEach((activity) => {
+  ratings.value[activity.id] = []
+})
+
+// Store the temporary rating when user hovers over these stars.
+const tempRatings = ref({})
+
+activities.forEach((activity) => {
+  tempRatings.value[activity.id] = 0
+})
+// Store the rating selected by the user for each activity.
+const selectedRatings = ref({})
+
+activities.forEach((activity) => {
+  selectedRatings.value[activity.id] = 0
+})
+
 // Filter activities according to the type selected by the user.
 const filteredAct = computed(() => 
 {
@@ -80,9 +100,57 @@ const filteredAct = computed(() =>
             <p>{{ activity.location }}</p>
             <p>{{ activity.type }}</p>
             <p>{{ activity.date }}</p>
+            <div class="rating-section mt-4">
+              <p class="mb-2 fw-semibold">Your Rating</p>
+
+              <div class="star-rating">
+                <button
+                  v-for="star in 5"
+                  :key="star"
+                  type="button"
+                  :class="[
+                    'star-button',
+                    star <= (tempRatings[activity.id] || selectedRatings[activity.id])
+                      ? 'star-filled'
+                      : 'star-empty'
+                  ]"
+                  @mouseenter="tempRatings[activity.id] = star"
+                  @mouseleave="tempRatings[activity.id] = 0"
+                  @click="selectedRatings[activity.id] = star"
+                >
+                  {{
+                    star <= (tempRatings[activity.id] || selectedRatings[activity.id])
+                      ? '★'
+                      : '☆'
+                  }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </main>
 </template>
+
+<style scoped>
+.star-button {
+  border: none;
+  background: transparent;
+  font-size: 1.8rem;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.star-filled {
+  color: #ffc107;
+}
+
+.star-empty {
+  color: #212529;
+}
+
+.star-button:hover {
+  transform: scale(1.15);
+}
+</style>
