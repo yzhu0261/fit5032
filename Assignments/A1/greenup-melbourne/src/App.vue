@@ -1,6 +1,30 @@
 <script setup>
 // Import RouterLink for navigation & RouteView for displaying.
+import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+
+// Store the current login user for getting the right navigation bar.
+const currentUser = ref(null)
+
+// Restore the login state when the application loads.
+const savedCurrentUser = localStorage.getItem('currentUser')
+if (savedCurrentUser) {
+  currentUser.value = JSON.parse(savedCurrentUser)
+}
+
+const updateCurrentUser = () => {
+
+  const savedCurrentUser = localStorage.getItem('currentUser')
+
+  currentUser.value = savedCurrentUser
+    ? JSON.parse(savedCurrentUser)
+    : null
+
+}
+
+// Listen for login or logout changes.
+window.addEventListener('auth-changed', updateCurrentUser)
+
 </script>
 
 <template>
@@ -34,14 +58,21 @@ import { RouterLink, RouterView } from 'vue-router'
             <RouterLink class="nav-link" to="/biodiversity-resources">Biodiversity & Resources</RouterLink>
             <RouterLink class="nav-link" to="/about">About Us</RouterLink>
             <RouterLink class="nav-link" to="/my-account">My Account</RouterLink>
+            <RouterLink
+              v-if="currentUser && currentUser.role === 'admin'"
+              class="nav-link"
+              to="/admin"
+            >
+              Admin
+            </RouterLink>
           </div>
         </div>
       </div>
     </nav>
   </header>
 
-  <!-- Displays the current page(flex-grow-1 ensures the footer will always be at the bottom). -->
-  <RouterView class="flex-grow-1" />
+<!-- Displays the current page(flex-grow-1 ensures the footer will always be at the bottom). -->
+<RouterView class="flex-grow-1" />
 
 <footer class="bg-success text-white mt-5 py-4">
   <div class="container">

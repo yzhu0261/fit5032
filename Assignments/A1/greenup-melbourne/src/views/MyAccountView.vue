@@ -1,23 +1,19 @@
 // This is a page help users to manage their accounts.
-
 <script setup>
 
 import { ref } from 'vue'
 
 // Store the user's input (The initial values are empty).
-
 const email = ref('')
 
 const password = ref('')
 
 // Store validation error messages.
-
 const emailError = ref('')
 
 const passwordError = ref('')
 
 // Store success message when successfully register.
-
 const successMessage = ref('')
 
 // Store login message.
@@ -32,20 +28,23 @@ const accountMode = ref('login')
 
 const currentUser = ref(null)
 
+// Create a admin account for role-based authentication.
+const adminUser = {
+  email: 'admin@greenup.com',
+  password: 'admin123',
+  role: 'admin'
+}
+
+// Restore the current user from local storage after refreshing the page.
 const savedCurrentUser = localStorage.getItem('currentUser')
-
 if (savedCurrentUser) {
-
   currentUser.value = JSON.parse(savedCurrentUser)
-
 }
 
 // email must be like string@string.string
-
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // Validate email when the user leaves the email input.
-
 const validateEmail = () => {
 
   emailError.value = ''
@@ -116,26 +115,44 @@ const login = () => {
 
   const savedUser = localStorage.getItem('registeredUser')
 
-  if (!savedUser) {
+  let registeredUser = null
 
-    loginMessage.value = 'No registered user found.'
+  if (savedUser) {
 
-    return
+    registeredUser = JSON.parse(savedUser)
 
   }
 
-  const user = JSON.parse(savedUser)
-
+  // Check whether the login details match admin account.
   if (
-    loginEmail.value === user.email &&
-    loginPassword.value === user.password
+    loginEmail.value === adminUser.email &&
+    loginPassword.value === adminUser.password
   ) {
 
-    localStorage.setItem('currentUser', JSON.stringify(user))
+    localStorage.setItem('currentUser', JSON.stringify(adminUser))
 
-    currentUser.value = user
+    currentUser.value = adminUser
+
+    window.dispatchEvent(new Event('auth-changed'))
 
     loginMessage.value = 'Login successful!'
+
+
+  // Check whether the login details match the registered user.
+  } else if (
+    registeredUser &&
+    loginEmail.value === registeredUser.email &&
+    loginPassword.value === registeredUser.password
+  ) {
+
+    localStorage.setItem('currentUser', JSON.stringify(registeredUser))
+
+    currentUser.value = registeredUser
+
+    // Notify other components that the authentication state has changed.
+    window.dispatchEvent(new Event('auth-changed'))
+
+    loginMessage.value = 'Login successful!f'
 
   } else {
 
@@ -150,6 +167,8 @@ const logout = () => {
   localStorage.removeItem('currentUser')
 
   currentUser.value = null
+
+  window.dispatchEvent(new Event('auth-changed'))
 
   loginEmail.value = ''
 

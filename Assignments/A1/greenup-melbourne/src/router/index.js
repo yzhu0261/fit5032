@@ -37,13 +37,37 @@ const router = createRouter
         name: 'my-account',
         component: () => import('../views/MyAccountView.vue'),
       },
+
+      // Only admin users are allowed to access admin page.
       {
         path: '/admin',
         name: 'admin',
         component: () => import('../views/AdminView.vue'),
+        meta: { requiresAdmin: true },
       },
     ],
   } 
 )
+
+// Check the users' role before getting into a page.
+router.beforeEach((to) => {
+
+  // Get the current login user from local storage.
+  const savedCurrentUser = localStorage.getItem('currentUser')
+
+  const currentUser = savedCurrentUser
+    ? JSON.parse(savedCurrentUser)
+    : null
+
+  if (
+    to.meta.requiresAdmin &&
+    (!currentUser || currentUser.role !== 'admin')
+  ) {
+
+    return '/my-account'
+
+  }
+
+})
 
 export default router
