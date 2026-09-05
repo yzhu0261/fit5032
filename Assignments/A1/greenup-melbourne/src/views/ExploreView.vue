@@ -49,6 +49,46 @@ activities.forEach((activity) => {
   selectedRatings.value[activity.id] = 0
 })
 
+// Store the rating submission message for each activity.
+
+const ratingMessages = ref({})
+
+activities.forEach((activity) => {
+  ratingMessages.value[activity.id] = ''
+})
+
+// Submit the selected rating for an activity.
+
+const submitRating = (activityId) => {
+  const rating = selectedRatings.value[activityId]
+
+  if (rating === 0) {
+    ratingMessages.value[activityId] =
+      'Please select a rating before submitting.'
+    return
+  }
+
+  ratings.value[activityId].push(rating)
+
+  ratingMessages.value[activityId] = 'Rating submitted!'
+}
+
+// Calculate the average rating.
+
+const getAverageRating = (activityId) => {
+  const activityRatings = ratings.value[activityId]
+
+  if (activityRatings.length === 0) 
+  {
+    return 0
+  }
+
+  const total = activityRatings.reduce
+  ((sum, rating) => sum + rating, 0)
+
+  return (total / activityRatings.length).toFixed(1)
+}
+
 // Filter activities according to the type selected by the user.
 const filteredAct = computed(() => 
 {
@@ -125,6 +165,40 @@ const filteredAct = computed(() =>
                   }}
                 </button>
               </div>
+
+            <div class="d-flex align-items-center gap-3 mt-3">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                @click="submitRating(activity.id)"
+              >
+                Submit Rating
+              </button>
+
+              <!-- Display relative message. -->
+              <p
+                v-if="ratingMessages[activity.id]"
+                :class="[
+                  'mb-0 small',
+                  selectedRatings[activity.id] === 0
+                    ? 'text-danger'
+                    : 'text-success'
+                ]"
+              >
+                {{ ratingMessages[activity.id] }}
+              </p>
+            </div>
+
+              <div class="rating-summary mt-3">
+                <span class="average-star">★</span>
+                <span class="fw-semibold">
+                  {{ getAverageRating(activity.id) }} / 5
+                </span>
+                <span class="text-muted small ms-2">
+                  {{ ratings[activity.id].length }} ratings
+                </span>
+              </div>
+
             </div>
           </div>
         </div>
@@ -152,5 +226,16 @@ const filteredAct = computed(() =>
 
 .star-button:hover {
   transform: scale(1.15);
+}
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+}
+
+.average-star {
+  color: #ffc107;
+  margin-right: 6px;
+  font-size: 1.1rem;
 }
 </style>
