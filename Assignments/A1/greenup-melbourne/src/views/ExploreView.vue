@@ -32,8 +32,17 @@ const activities = [
 // Store the ratings.
 const ratings = ref({})
 
+const savedRatings = localStorage.getItem('activityRatings')
+if (savedRatings) {
+  ratings.value = JSON.parse(savedRatings)
+}
+
 activities.forEach((activity) => {
-  ratings.value[activity.id] = []
+
+  if (!ratings.value[activity.id]) {
+    ratings.value[activity.id] = []
+  }
+
 })
 
 // Store the temporary rating when user hovers over these stars.
@@ -50,31 +59,70 @@ activities.forEach((activity) => {
 })
 
 // Store the rating submission message for each activity.
-
 const ratingMessages = ref({})
 
 activities.forEach((activity) => {
   ratingMessages.value[activity.id] = ''
 })
 
-// Submit the selected rating for an activity.
+// Store the type of rating message for each activity.
+const ratingMessageTypes = ref({})
 
+activities.forEach((activity) => {
+  ratingMessageTypes.value[activity.id] = ''
+})
+
+// Submit the selected rating for an activity.
 const submitRating = (activityId) => {
+
+  const savedCurrentUser = localStorage.getItem('currentUser')
+
+  if (!savedCurrentUser) {
+    ratingMessages.value[activityId] =
+      'Please log in before submitting a rating.'
+
+    ratingMessageTypes.value[activityId] = 'error'
+
+    return
+  }
+
+  const currentUser = JSON.parse(savedCurrentUser)
+
   const rating = selectedRatings.value[activityId]
 
   if (rating === 0) {
     ratingMessages.value[activityId] =
       'Please select a rating before submitting.'
+
+    ratingMessageTypes.value[activityId] = 'error'
+
     return
   }
 
-  ratings.value[activityId].push(rating)
+  // Check whether the current user has already rated this activity.
+  const existingRatingIndex = ratings.value[activityId].findIndex(
+    (item) => item.email === currentUser.email
+  )
 
+  if (existingRatingIndex === -1) {
+    // Add a new rating if the user has not rated this activity yet.
+    ratings.value[activityId].push({
+      email: currentUser.email,
+      score: rating
+    })
+
+  } else {
+    // Update the existing rating if the user has already rated this activity.
+    ratings.value[activityId][existingRatingIndex].score = rating
+  }
+
+  localStorage.setItem('activityRatings', JSON.stringify(ratings.value))
   ratingMessages.value[activityId] = 'Rating submitted!'
+
+  ratingMessageTypes.value[activityId] = 'success'
 }
 
 // Calculate the average rating.
-
 const getAverageRating = (activityId) => {
   const activityRatings = ratings.value[activityId]
 
@@ -84,7 +132,7 @@ const getAverageRating = (activityId) => {
   }
 
   const total = activityRatings.reduce
-  ((sum, rating) => sum + rating, 0)
+  ((sum, rating) => sum + rating.score, 0)
 
   return (total / activityRatings.length).toFixed(1)
 }
@@ -180,7 +228,7 @@ const filteredAct = computed(() =>
                 v-if="ratingMessages[activity.id]"
                 :class="[
                   'mb-0 small',
-                  selectedRatings[activity.id] === 0
+                  ratingMessageTypes[activity.id] === 'error'
                     ? 'text-danger'
                     : 'text-success'
                 ]"
@@ -195,7 +243,9 @@ const filteredAct = computed(() =>
                   {{ getAverageRating(activity.id) }} / 5
                 </span>
                 <span class="text-muted small ms-2">
-                  {{ ratings[activity.id].length }} ratings
+                  <!-- If there is only 1 rating, then use rating, else use ratings. -->
+                  {{ ratings[activity.id].length }}
+                  {{ ratings[activity.id].length === 1 ? 'rating' : 'ratings' }}
                 </span>
               </div>
 
