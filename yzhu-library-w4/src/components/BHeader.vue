@@ -48,6 +48,17 @@
             Logout
           </button>
         </li>
+
+        <!-- Firebase authentication page for Week 7 -->
+        <li class="nav-item">
+          <router-link
+            to="/FireLogin"
+            class="nav-link"
+            active-class="active"
+          >
+            Firebase Login
+          </router-link>
+       </li>
       </ul>
     </header>
   </div>
