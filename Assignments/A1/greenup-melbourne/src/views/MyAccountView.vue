@@ -1,26 +1,25 @@
 // This is a page help users to manage their accounts.
 <script setup>
-
 import { ref } from 'vue'
 
 // Store the user's input (The initial values are empty).
 const email = ref('')
-
 const password = ref('')
 
 // Store validation error messages.
 const emailError = ref('')
-
 const passwordError = ref('')
 
 // Store success message when successfully register.
 const successMessage = ref('')
 
 // Store login message.
-
 const loginEmail = ref('')
-
 const loginPassword = ref('')
+
+// Store login validation error messages.
+const loginEmailError = ref('')
+const loginPasswordError = ref('')
 
 const loginMessage = ref('')
 
@@ -62,21 +61,35 @@ const validateEmail = () => {
 }
 
 // Validate password when the user leaves the password input.
-
 const validatePassword = () => {
-
   passwordError.value = ''
 
   if (password.value === '') {
-
     passwordError.value = 'Password is required.'
-
   } else if (password.value.length < 8) {
-
     passwordError.value = 'Password must be at least 8 characters.'
+  }
+}
 
+// Validate the login input.
+const validateLogin = () => {
+  loginEmailError.value = ''
+  loginPasswordError.value = ''
+
+  if (loginEmail.value === '') {
+    loginEmailError.value = 'Email is required.'
+  } else if (!emailPattern.test(loginEmail.value)) {
+    loginEmailError.value = 'Invalid email address.'
   }
 
+  if (loginPassword.value === '') {
+    loginPasswordError.value = 'Password is required.'
+  }
+
+  return (
+    loginEmailError.value === '' &&
+    loginPasswordError.value === ''
+  )
 }
 
 // Prompts relative error information.
@@ -110,17 +123,18 @@ const validateForm = () => {
 }
 
 const login = () => {
-
   loginMessage.value = ''
+
+  if (!validateLogin()) {
+    return
+  }
 
   const savedUser = localStorage.getItem('registeredUser')
 
   let registeredUser = null
 
   if (savedUser) {
-
     registeredUser = JSON.parse(savedUser)
-
   }
 
   // Check whether the login details match admin account.
@@ -152,7 +166,7 @@ const login = () => {
     // Notify other components that the authentication state has changed.
     window.dispatchEvent(new Event('auth-changed'))
 
-    loginMessage.value = 'Login successful!f'
+    loginMessage.value = 'Login successful!'
 
   } else {
 
@@ -181,21 +195,15 @@ const logout = () => {
 </script>
 
 <template>
-
   <main class="container py-5">
-
     <h1>My Account</h1>
 
     <p>Login or create an account to join GreenUp Melbourne activities.</p>
 
     <div class="row">
-
       <div class="col-12 col-md-8 col-lg-6">
-
         <div v-if="!currentUser">
-
           <div class="mb-4">
-
             <button
               type="button"
               class="btn btn-outline-success me-2"
@@ -242,11 +250,8 @@ const logout = () => {
             </div>
 
             <div class="mb-3">
-
               <label for="password" class="form-label">Password</label>
-
               <!-- Bind the input to the password. -->
-
               <input
                 id="password"
                 v-model="password"
@@ -272,15 +277,11 @@ const logout = () => {
           </form>
 
           <div v-if="accountMode === 'login'">
-
             <h2>Login</h2>
 
-            <form class="mt-4" @submit.prevent="login">
-
+            <form class="mt-4" @submit.prevent="login" novalidate>
               <div class="mb-3">
-
                 <label for="loginEmail" class="form-label">Email Address</label>
-
                 <input
                   id="loginEmail"
                   v-model="loginEmail"
@@ -288,12 +289,13 @@ const logout = () => {
                   class="form-control"
                 />
 
+                <p v-if="loginEmailError" class="text-danger mt-1">
+                  {{ loginEmailError }}
+                </p>
               </div>
 
               <div class="mb-3">
-
                 <label for="loginPassword" class="form-label">Password</label>
-
                 <input
                   id="loginPassword"
                   v-model="loginPassword"
@@ -301,30 +303,26 @@ const logout = () => {
                   class="form-control"
                 />
 
+                <p v-if="loginPasswordError" class="text-danger mt-1">
+                  {{ loginPasswordError }}
+                </p>
               </div>
 
               <button type="submit" class="btn btn-success">
                 Login
               </button>
 
-              <p v-if="loginMessage" class="mt-3">
+              <p v-if="loginMessage" class="text-danger mt-2">
                 {{ loginMessage }}
               </p>
 
             </form>
-
           </div>
-
         </div>
-
         <div v-else>
-
           <h2>Welcome</h2>
-
           <p>{{ currentUser.email }}</p>
-
           <p>Role: {{ currentUser.role }}</p>
-
           <button
             type="button"
             class="btn btn-success"
@@ -332,13 +330,8 @@ const logout = () => {
           >
             Logout
           </button>
-
         </div>
-
       </div>
-
     </div>
-
   </main>
-
 </template>

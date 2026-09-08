@@ -1,3 +1,61 @@
 <template>
-  <h1>Firebase Login</h1>
+  <h1>Sign in</h1>
+
+  <p>
+    <input type="text" placeholder="Email" v-model="email" />
+  </p>
+
+  <p>
+    <input type="password" placeholder="Password" v-model="password" />
+  </p>
+
+  <p>
+    <button @click="signin">Sign in via Firebase</button>
+  </p>
+
+  <p>
+  <button @click="logout">Log out</button>
+  </p>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth'
+import { useRouter } from 'vue-router'
+
+const email = ref('')
+const password = ref('')
+const router = useRouter()
+const auth = getAuth()
+
+const signin = () => {
+  signInWithEmailAndPassword(auth, email.value, password.value)
+    .then(() => {
+      console.log('Firebase Sign in Successful!')
+      console.log(auth.currentUser)
+
+      const user = auth.currentUser
+
+      if (user.email === 'admin5032@example.com') {
+        console.log('Role: Admin')
+      } else {
+        console.log('Role: User')
+      }
+      router.push('/')
+    })
+    .catch((error) => {
+      console.log(error.code)
+    })
+}
+
+const logout = () => {
+  signOut(auth)
+    .then(() => {
+      console.log('Firebase Logout Successful!')
+      console.log(auth.currentUser)
+    })
+    .catch((error) => {
+      console.log(error.code)
+    })
+}
+</script>

@@ -99,6 +99,16 @@ const submitRating = (activityId) => {
     return
   }
 
+  // Validate the rating before saving it.
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    ratingMessages.value[activityId] =
+      'Invalid rating.'
+
+    ratingMessageTypes.value[activityId] = 'error'
+
+    return
+  }
+
   // Check whether the current user has already rated this activity.
   const existingRatingIndex = ratings.value[activityId].findIndex(
     (item) => item.email === currentUser.email
