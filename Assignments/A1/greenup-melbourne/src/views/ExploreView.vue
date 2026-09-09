@@ -105,6 +105,15 @@ const submitRating = (activityId) => {
       'Invalid rating.'
 
     ratingMessageTypes.value[activityId] = 'error'
+    return
+  }
+
+  // Validate the rating before saving it.
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+    ratingMessages.value[activityId] =
+      'Invalid rating.'
+
+    ratingMessageTypes.value[activityId] = 'error'
 
     return
   }
