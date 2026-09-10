@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 // Import the Home page.
 import HomeView from '../views/HomeView.vue'
 
-// Create a router for managing navigation between pages
+// Create a router for managing navigation between pages.
 const router = createRouter
 (
   {
@@ -55,17 +55,19 @@ router.beforeEach((to) => {
   // Get the current login user from local storage.
   const savedCurrentUser = localStorage.getItem('currentUser')
 
+  // Convert the saved user data back to a JavaScript.object.
   const currentUser = savedCurrentUser
     ? JSON.parse(savedCurrentUser)
     : null
 
+  // If user is not an administrator.
   if (
     to.meta.requiresAdmin &&
     (!currentUser || currentUser.role !== 'admin')
   ) {
 
     return '/my-account'
-
+    
   }
 
 })

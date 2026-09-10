@@ -1,7 +1,7 @@
-// This is a page helps users to find a suitable activity.
+<!-- This page helps users find suitable environmental activities. -->
 <script setup>
 import { ref, computed } from 'vue'
-// Store the activity type
+// Store the activity type.
 const selectedType = ref('All')
 
 // Store environmental activity information.
@@ -32,11 +32,13 @@ const activities = [
 // Store the ratings.
 const ratings = ref({})
 
+// Load previously saved ratings from Local Storage.
 const savedRatings = localStorage.getItem('activityRatings')
 if (savedRatings) {
   ratings.value = JSON.parse(savedRatings)
 }
 
+// Ensure each activity has its own rating list.
 activities.forEach((activity) => {
 
   if (!ratings.value[activity.id]) {
@@ -75,6 +77,7 @@ activities.forEach((activity) => {
 // Submit the selected rating for an activity.
 const submitRating = (activityId) => {
 
+  // Check whether the user is logged in.
   const savedCurrentUser = localStorage.getItem('currentUser')
 
   if (!savedCurrentUser) {
@@ -108,16 +111,6 @@ const submitRating = (activityId) => {
     return
   }
 
-  // Validate the rating before saving it.
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    ratingMessages.value[activityId] =
-      'Invalid rating.'
-
-    ratingMessageTypes.value[activityId] = 'error'
-
-    return
-  }
-
   // Check whether the current user has already rated this activity.
   const existingRatingIndex = ratings.value[activityId].findIndex(
     (item) => item.email === currentUser.email
@@ -135,6 +128,7 @@ const submitRating = (activityId) => {
     ratings.value[activityId][existingRatingIndex].score = rating
   }
 
+  // Save the updated ratings to Local Storage.
   localStorage.setItem('activityRatings', JSON.stringify(ratings.value))
   ratingMessages.value[activityId] = 'Rating submitted!'
 
@@ -242,7 +236,7 @@ const filteredAct = computed(() =>
                 Submit Rating
               </button>
 
-              <!-- Display relative message. -->
+              <!-- Display the rating submission message. -->
               <p
                 v-if="ratingMessages[activity.id]"
                 :class="[

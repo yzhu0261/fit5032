@@ -1,10 +1,10 @@
-// This is a page helps adminstractors to manage activities.
+<!-- This page helps administrators to manage activities. -->
 <template>
   <main class="container py-5">
     <h1>Admin</h1>
 
     <p>
-      This is for managing GreenUp Melbourne activities.
+      This page is for managing GreenUp Melbourne activities.
     </p>
 
     <div class="card mt-4">

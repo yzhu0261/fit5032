@@ -1,11 +1,11 @@
-// This is a page illustrates our goal.
+<!-- This page introduces GreenUp Melbourne and its goals. -->
 <template>
   <main class="container py-5">
     <h1>About Us</h1>
 
     <p>GreenUp Melbourne is a website that helps people to discover local greening and biodiversity activities in Melbourne.</p>
 
-    <p>The website aims to make it easier for users to find local environmental activities, learn more about local biodiversity.</p>
+    <p>The website aims to make it easier for users to find local environmental activities, and learn more about local biodiversity.</p>
 
     <h2 class="h4 mt-4">Our Goals</h2>
 

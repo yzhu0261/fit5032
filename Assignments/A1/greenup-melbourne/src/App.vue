@@ -12,6 +12,7 @@ if (savedCurrentUser) {
   currentUser.value = JSON.parse(savedCurrentUser)
 }
 
+// Update the current user after login or logout.
 const updateCurrentUser = () => {
 
   const savedCurrentUser = localStorage.getItem('currentUser')
@@ -58,6 +59,8 @@ window.addEventListener('auth-changed', updateCurrentUser)
             <RouterLink class="nav-link" to="/biodiversity-resources">Biodiversity & Resources</RouterLink>
             <RouterLink class="nav-link" to="/about">About Us</RouterLink>
             <RouterLink class="nav-link" to="/my-account">My Account</RouterLink>
+            
+            <!-- Show the Admin link only to admin users. -->
             <RouterLink
               v-if="currentUser && currentUser.role === 'admin'"
               class="nav-link"

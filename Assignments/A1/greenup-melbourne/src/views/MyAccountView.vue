@@ -1,4 +1,4 @@
-// This is a page help users to manage their accounts.
+<!-- This page allows users to register, log in, and manage their account. -->
 <script setup>
 import { ref } from 'vue'
 
@@ -13,7 +13,7 @@ const passwordError = ref('')
 // Store success message when successfully register.
 const successMessage = ref('')
 
-// Store login message.
+// Store the login input.
 const loginEmail = ref('')
 const loginPassword = ref('')
 
@@ -21,13 +21,16 @@ const loginPassword = ref('')
 const loginEmailError = ref('')
 const loginPasswordError = ref('')
 
+// Store the login result message.
 const loginMessage = ref('')
 
+// Control whether the login or register page is displayed.
 const accountMode = ref('login')
 
+// Store the currently login user.
 const currentUser = ref(null)
 
-// Create a admin account for role-based authentication.
+// Create an admin account for role-based authentication.
 const adminUser = {
   email: 'admin@greenup.com',
   password: 'admin123',
@@ -40,7 +43,7 @@ if (savedCurrentUser) {
   currentUser.value = JSON.parse(savedCurrentUser)
 }
 
-// email must be like string@string.string
+// email must be string@string.string.
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 // Validate email when the user leaves the email input.
@@ -92,8 +95,7 @@ const validateLogin = () => {
   )
 }
 
-// Prompts relative error information.
-
+// Validate the registration form and create a user account.
 const validateForm = () => {
 
   successMessage.value = ''
@@ -103,25 +105,18 @@ const validateForm = () => {
   validatePassword()
 
   if (emailError.value === '' && passwordError.value === '') {
-
     const user = {
-
       email: email.value,
-
       password: password.value,
-
       role: 'user'
-
     }
 
     localStorage.setItem('registeredUser', JSON.stringify(user))
-
     successMessage.value = 'Registration successful!'
-
   }
-
 }
 
+// Log in as an damin or a common user.
 const login = () => {
   loginMessage.value = ''
 
@@ -129,6 +124,7 @@ const login = () => {
     return
   }
 
+  // Load the registered user from Local Storage.
   const savedUser = localStorage.getItem('registeredUser')
 
   let registeredUser = null
@@ -176,8 +172,8 @@ const login = () => {
 
 }
 
+// Log out and clear the login state.
 const logout = () => {
-
   localStorage.removeItem('currentUser')
 
   currentUser.value = null
@@ -189,7 +185,6 @@ const logout = () => {
   loginPassword.value = ''
 
   loginMessage.value = ''
-
 }
 
 </script>
@@ -202,6 +197,8 @@ const logout = () => {
 
     <div class="row">
       <div class="col-12 col-md-8 col-lg-6">
+
+        <!-- Show Login and Register forms when no user is logged in. -->
         <div v-if="!currentUser">
           <div class="mb-4">
             <button
@@ -230,11 +227,7 @@ const logout = () => {
           >
 
             <div class="mb-3">
-
               <label for="email" class="form-label">Email Address</label>
-
-              <!-- v-model creates a two-way binding between the input and email. -->
-
               <input
                 id="email"
                 v-model="email"
@@ -251,7 +244,6 @@ const logout = () => {
 
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
-              <!-- Bind the input to the password. -->
               <input
                 id="password"
                 v-model="password"
@@ -319,6 +311,8 @@ const logout = () => {
             </form>
           </div>
         </div>
+        
+        <!-- Show the current user's account details after login. -->
         <div v-else>
           <h2>Welcome</h2>
           <p>{{ currentUser.email }}</p>

@@ -1,4 +1,4 @@
-// This is the Home Page, users will start from here.
+<!-- This is the home page where users can start exploring the website. -->
 <script setup>
 import { RouterLink } from 'vue-router'
 </script>
