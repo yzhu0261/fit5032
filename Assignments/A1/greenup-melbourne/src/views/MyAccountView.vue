@@ -106,13 +106,23 @@ const validateForm = () => {
 
   if (emailError.value === '' && passwordError.value === '') {
     const user = {
-      email: email.value,
-      password: password.value,
-      role: 'user'
-    }
+    email: email.value,
+    password: password.value,
+    role: 'user'
+  }
 
-    localStorage.setItem('registeredUser', JSON.stringify(user))
-    successMessage.value = 'Registration successful!'
+  // Get the existing registered users.
+  const savedUsers = localStorage.getItem('registeredUsers')
+
+  const registeredUsers = savedUsers? JSON.parse(savedUsers): []
+
+  // Add the new user to the user list.
+  registeredUsers.push(user)
+
+  // Save all registered users to Local Storage.
+  localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers))
+
+  successMessage.value = 'Registration successful!'
   }
 }
 
@@ -124,14 +134,19 @@ const login = () => {
     return
   }
 
-  // Load the registered user from Local Storage.
-  const savedUser = localStorage.getItem('registeredUser')
+  // Load all registered users from Local Storage.
+  const savedUsers = localStorage.getItem('registeredUsers')
 
-  let registeredUser = null
+  const registeredUsers = savedUsers
+    ? JSON.parse(savedUsers)
+    : []
 
-  if (savedUser) {
-    registeredUser = JSON.parse(savedUser)
-  }
+  // Find a registered user with matching login details.
+  const registeredUser = registeredUsers.find(
+    (user) =>
+      user.email === loginEmail.value &&
+      user.password === loginPassword.value
+  )
 
   // Check whether the login details match admin account.
   if (
@@ -149,12 +164,8 @@ const login = () => {
 
 
   // Check whether the login details match the registered user.
-  } else if (
-    registeredUser &&
-    loginEmail.value === registeredUser.email &&
-    loginPassword.value === registeredUser.password
-  ) {
-
+  } 
+  else if (registeredUser) {
     localStorage.setItem('currentUser', JSON.stringify(registeredUser))
 
     currentUser.value = registeredUser
@@ -163,11 +174,9 @@ const login = () => {
     window.dispatchEvent(new Event('auth-changed'))
 
     loginMessage.value = 'Login successful!'
-
-  } else {
-
+  } 
+  else {
     loginMessage.value = 'Invalid email or password.'
-
   }
 
 }
@@ -311,7 +320,7 @@ const logout = () => {
             </form>
           </div>
         </div>
-        
+
         <!-- Show the current user's account details after login. -->
         <div v-else>
           <h2>Welcome</h2>
