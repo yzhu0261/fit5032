@@ -2,6 +2,16 @@
 <script setup>
 import { ref } from 'vue'
 
+import {
+  getAuth,
+  createUserWithEmailAndPassword
+} from 'firebase/auth'
+
+import '../firebase.js'
+
+// Get the firebase authentication.
+const auth = getAuth()
+
 // Store the user's input (The initial values are empty).
 const email = ref('')
 const password = ref('')
@@ -95,34 +105,31 @@ const validateLogin = () => {
   )
 }
 
-// Validate the registration form and create a user account.
-const validateForm = () => {
-
+// Validate the registration form and create a user account with Firebase.
+const validateForm = async () => {
   successMessage.value = ''
 
   validateEmail()
-
   validatePassword()
 
   if (emailError.value === '' && passwordError.value === '') {
-    const user = {
-    email: email.value,
-    password: password.value,
-    role: 'user'
-  }
+    try {
+      // Create the user account using Firebase Authentication.
+      await createUserWithEmailAndPassword(
+        auth,
+        email.value,
+        password.value
+      )
 
-  // Get the existing registered users.
-  const savedUsers = localStorage.getItem('registeredUsers')
+      successMessage.value = 'Registration successful!'
 
-  const registeredUsers = savedUsers? JSON.parse(savedUsers): []
-
-  // Add the new user to the user list.
-  registeredUsers.push(user)
-
-  // Save all registered users to Local Storage.
-  localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers))
-
-  successMessage.value = 'Registration successful!'
+      // Clear the registration form after successful registration.
+      email.value = ''
+      password.value = ''
+    } catch (error) {
+      // Display error message if Firebase cannot create an account.
+      successMessage.value = 'Registration failed: ' + error.message
+    }
   }
 }
 
