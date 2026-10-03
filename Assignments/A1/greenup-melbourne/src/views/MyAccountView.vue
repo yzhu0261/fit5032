@@ -4,7 +4,9 @@ import { ref } from 'vue'
 
 import {
   getAuth,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut
 } from 'firebase/auth'
 
 import '../firebase.js'
@@ -133,74 +135,55 @@ const validateForm = async () => {
   }
 }
 
-// Log in as an damin or a common user.
-const login = () => {
+// Log in with Firebase Authentication.
+const login = async () => {
   loginMessage.value = ''
 
   if (!validateLogin()) {
     return
   }
 
-  // Load all registered users from Local Storage.
-  const savedUsers = localStorage.getItem('registeredUsers')
+  try {
+    // Ask Firebase to authenticate the user's email & password.
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      loginEmail.value,
+      loginPassword.value
+    )
 
-  const registeredUsers = savedUsers
-    ? JSON.parse(savedUsers)
-    : []
-
-  // Find a registered user with matching login details.
-  const registeredUser = registeredUsers.find(
-    (user) =>
-      user.email === loginEmail.value &&
-      user.password === loginPassword.value
-  )
-
-  // Check whether the login details match admin account.
-  if (
-    loginEmail.value === adminUser.email &&
-    loginPassword.value === adminUser.password
-  ) {
-
-    localStorage.setItem('currentUser', JSON.stringify(adminUser))
-
-    currentUser.value = adminUser
-
-    window.dispatchEvent(new Event('auth-changed'))
+    // Store the authenticated Firebase user for displaying account details.
+    currentUser.value = {
+      email: userCredential.user.email,
+      uid: userCredential.user.uid,
+      role: 'user'
+    }
 
     loginMessage.value = 'Login successful!'
-
-
-  // Check whether the login details match the registered user.
-  } 
-  else if (registeredUser) {
-    localStorage.setItem('currentUser', JSON.stringify(registeredUser))
-
-    currentUser.value = registeredUser
-
-    // Notify other components that the authentication state has changed.
-    window.dispatchEvent(new Event('auth-changed'))
-
-    loginMessage.value = 'Login successful!'
-  } 
-  else {
+  } catch (error) {
     loginMessage.value = 'Invalid email or password.'
   }
-
 }
 
-// Log out and clear the login state.
-const logout = () => {
-  localStorage.removeItem('currentUser')
+// Log out with Firebase.
+const logout = async () => {
+  try {
+    // Log out the current user.
+    await signOut(auth)
 
-  currentUser.value = null
+    // Remove the saved user.
+    localStorage.removeItem('currentUser')
 
-  window.dispatchEvent(new Event('auth-changed'))
+    currentUser.value = null
 
-  loginEmail.value = ''
+    // Update the authentication state.
+    window.dispatchEvent(new Event('auth-changed'))
 
-  loginPassword.value = ''
-
-  loginMessage.value = ''
+    loginEmail.value = ''
+    loginPassword.value = ''
+    loginMessage.value = ''
+  } catch (error) {
+    console.error('Logout failed:', error)
+  }
 }
 
 </script>
