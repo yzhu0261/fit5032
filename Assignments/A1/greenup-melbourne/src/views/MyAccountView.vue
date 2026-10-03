@@ -42,13 +42,6 @@ const accountMode = ref('login')
 // Store the currently login user.
 const currentUser = ref(null)
 
-// Create an admin account for role-based authentication.
-const adminUser = {
-  email: 'admin@greenup.com',
-  password: 'admin123',
-  role: 'admin'
-}
-
 // Restore the current user from local storage after refreshing the page.
 const savedCurrentUser = localStorage.getItem('currentUser')
 if (savedCurrentUser) {
@@ -151,12 +144,26 @@ const login = async () => {
       loginPassword.value
     )
 
-    // Store the authenticated Firebase user for displaying account details.
-    currentUser.value = {
+    // Set the user role after login.
+    const role =
+      userCredential.user.email === 'admin@greenup.com'
+        ? 'admin'
+        : 'user'
+
+    // Store the current user details.
+    const user = {
       email: userCredential.user.email,
       uid: userCredential.user.uid,
-      role: 'user'
+      role: role
     }
+
+    currentUser.value = user
+
+    // Save the user for the existing navigation and admin access.
+    localStorage.setItem('currentUser', JSON.stringify(user))
+
+    // Update the authentication state.
+    window.dispatchEvent(new Event('auth-changed'))
 
     loginMessage.value = 'Login successful!'
   } catch (error) {
