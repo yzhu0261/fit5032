@@ -221,145 +221,236 @@ const logout = async () => {
 
 <template>
   <main class="container py-5">
-    <h1>My Account</h1>
+    <div class="text-center mb-4">
+      <h1 class="fw-bold">My Account</h1>
 
-    <p>Login or create an account to join GreenUp Melbourne activities.</p>
+      <p class="text-muted">
+        Login or create an account to join GreenUp Melbourne activities.
+      </p>
+    </div>
 
-    <div class="row">
+    <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-6">
 
-        <!-- Show a message while Firebase checks the login state. -->
-        <div v-if="authLoading">
-          <p>Loading account...</p>
-        </div>
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-4 p-md-5">
 
-        <!-- Show Login and Register forms when no user is logged in. -->
-        <div v-else-if="!currentUser">
-          <div class="mb-4">
-            <button
-              type="button"
-              class="btn btn-outline-success me-2"
-              @click="accountMode = 'login'"
-            >
-              Login
-            </button>
+            <!-- Show a message while Firebase checks the login state. -->
+            <div v-if="authLoading" class="text-center py-4">
+              <div
+                class="spinner-border text-success mb-3"
+                role="status"
+              >
+                <span class="visually-hidden">Loading...</span>
+              </div>
 
-            <button
-              type="button"
-              class="btn btn-outline-success"
-              @click="accountMode = 'register'"
-            >
-              Register
-            </button>
-
-          </div>
-
-          <form
-            v-if="accountMode === 'register'"
-            class="mt-4"
-            @submit.prevent="validateForm"
-            novalidate
-          >
-
-            <div class="mb-3">
-              <label for="email" class="form-label">Email Address</label>
-              <input
-                id="email"
-                v-model="email"
-                type="email"
-                class="form-control"
-                @blur="validateEmail"
-              />
-
-              <p v-if="emailError" class="text-danger mt-1">
-                {{ emailError }}
-              </p>
-
+              <p class="text-muted mb-0">Loading account...</p>
             </div>
 
-            <div class="mb-3">
-              <label for="password" class="form-label">Password</label>
-              <input
-                id="password"
-                v-model="password"
-                type="password"
-                class="form-control"
-                @blur="validatePassword"
-              />
+            <!-- Show Login and Register forms when no user is logged in. -->
+            <div v-else-if="!currentUser">
+              <div class="d-flex justify-content-center mb-4">
+                <button
+                  type="button"
+                  class="btn me-2"
+                  :class="accountMode === 'login'
+                    ? 'btn-success'
+                    : 'btn-outline-success'"
+                  @click="accountMode = 'login'"
+                >
+                  Login
+                </button>
 
-              <p v-if="passwordError" class="text-danger mt-1">
-                {{ passwordError }}
-              </p>
+                <button
+                  type="button"
+                  class="btn"
+                  :class="accountMode === 'register'
+                    ? 'btn-success'
+                    : 'btn-outline-success'"
+                  @click="accountMode = 'register'"
+                >
+                  Register
+                </button>
 
+              </div>
+
+              <form
+                v-if="accountMode === 'register'"
+                class="mt-4"
+                @submit.prevent="validateForm"
+                novalidate
+              >
+                <div class="text-center mb-4">
+                  <h2 class="h4 fw-bold">Create Account</h2>
+                  <p class="text-muted mb-0">
+                    Create your GreenUp Melbourne account.
+                  </p>
+                </div>
+
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email Address</label>
+                  <input
+                    id="email"
+                    v-model="email"
+                    type="email"
+                    class="form-control"
+                    placeholder="Enter your email"
+                    @blur="validateEmail"
+                  />
+
+                  <p v-if="emailError" class="text-danger mt-1">
+                    {{ emailError }}
+                  </p>
+
+                </div>
+
+                <div class="mb-4">
+                  <label for="password" class="form-label">Password</label>
+                  <input
+                    id="password"
+                    v-model="password"
+                    type="password"
+                    class="form-control"
+                    placeholder="Enter your password"
+                    @blur="validatePassword"
+                  />
+
+                  <p v-if="passwordError" class="text-danger mt-1">
+                    {{ passwordError }}
+                  </p>
+
+                </div>
+
+                <button
+                  type="submit"
+                  class="btn btn-success w-100"
+                >
+                  Register
+                </button>
+
+                <p v-if="successMessage" class="text-success text-center mt-3">
+                  {{ successMessage }}
+                </p>
+
+              </form>
+
+              <div v-if="accountMode === 'login'">
+                <div class="text-center mb-4">
+                  <h2 class="h4 fw-bold">Welcome Back</h2>
+                  <p class="text-muted mb-0">
+                    Login to continue to your account.
+                  </p>
+                </div>
+
+                <form class="mt-4" @submit.prevent="login" novalidate>
+                  <div class="mb-3">
+                    <label for="loginEmail" class="form-label">
+                      Email Address
+                    </label>
+
+                    <input
+                      id="loginEmail"
+                      v-model="loginEmail"
+                      type="email"
+                      class="form-control"
+                      placeholder="Enter your email"
+                    />
+
+                    <p v-if="loginEmailError" class="text-danger mt-1">
+                      {{ loginEmailError }}
+                    </p>
+                  </div>
+
+                  <div class="mb-4">
+                    <label for="loginPassword" class="form-label">
+                      Password
+                    </label>
+
+                    <input
+                      id="loginPassword"
+                      v-model="loginPassword"
+                      type="password"
+                      class="form-control"
+                      placeholder="Enter your password"
+                    />
+
+                    <p v-if="loginPasswordError" class="text-danger mt-1">
+                      {{ loginPasswordError }}
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    class="btn btn-success w-100"
+                  >
+                    Login
+                  </button>
+
+                  <p v-if="loginMessage" class="text-danger text-center mt-3">
+                    {{ loginMessage }}
+                  </p>
+
+                </form>
+              </div>
             </div>
 
-            <button type="submit" class="btn btn-success">
-              Register
-            </button>
+            <!-- Show the current user's account details after login. -->
+            <div v-else class="text-center">
+              <div class="mb-4">
+                <div
+                  class="bg-success-subtle rounded-circle d-inline-flex
+                         align-items-center justify-content-center mb-3"
+                  style="width: 72px; height: 72px;"
+                >
+                  <span class="fs-2">🌱</span>
+                </div>
 
-            <p v-if="successMessage" class="text-success mt-3">
-              {{ successMessage }}
-            </p>
+                <h2 class="h3 fw-bold mb-2">Welcome</h2>
 
-          </form>
-
-          <div v-if="accountMode === 'login'">
-            <h2>Login</h2>
-
-            <form class="mt-4" @submit.prevent="login" novalidate>
-              <div class="mb-3">
-                <label for="loginEmail" class="form-label">Email Address</label>
-                <input
-                  id="loginEmail"
-                  v-model="loginEmail"
-                  type="email"
-                  class="form-control"
-                />
-
-                <p v-if="loginEmailError" class="text-danger mt-1">
-                  {{ loginEmailError }}
+                <p class="text-muted mb-3">
+                  You are signed in to GreenUp Melbourne.
                 </p>
               </div>
 
-              <div class="mb-3">
-                <label for="loginPassword" class="form-label">Password</label>
-                <input
-                  id="loginPassword"
-                  v-model="loginPassword"
-                  type="password"
-                  class="form-control"
-                />
+              <div class="bg-light rounded-3 p-3 mb-4 text-start">
+                <div class="mb-3">
+                  <small class="text-muted d-block">Email Address</small>
+                  <span class="fw-semibold">
+                    {{ currentUser.email }}
+                  </span>
+                </div>
 
-                <p v-if="loginPasswordError" class="text-danger mt-1">
-                  {{ loginPasswordError }}
-                </p>
+                <div>
+                  <small class="text-muted d-block mb-1">Account Role</small>
+
+                  <span
+                    v-if="currentUser.role === 'admin'"
+                    class="badge text-bg-success"
+                  >
+                    Admin
+                  </span>
+
+                  <span
+                    v-else
+                    class="badge text-bg-secondary"
+                  >
+                    User
+                  </span>
+                </div>
               </div>
 
-              <button type="submit" class="btn btn-success">
-                Login
+              <button
+                type="button"
+                class="btn btn-outline-success w-100"
+                @click="logout"
+              >
+                Logout
               </button>
+            </div>
 
-              <p v-if="loginMessage" class="text-danger mt-2">
-                {{ loginMessage }}
-              </p>
-
-            </form>
           </div>
         </div>
 
-        <!-- Show the current user's account details after login. -->
-        <div v-else>
-          <h2>Welcome</h2>
-          <p>{{ currentUser.email }}</p>
-          <p>Role: {{ currentUser.role }}</p>
-          <button
-            type="button"
-            class="btn btn-success"
-            @click="logout"
-          >
-            Logout
-          </button>
-        </div>
       </div>
     </div>
   </main>

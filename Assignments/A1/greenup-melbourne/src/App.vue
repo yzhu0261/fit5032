@@ -31,11 +31,13 @@ window.addEventListener('auth-changed', updateCurrentUser)
 <template>
   <header>
     <!-- Bootstrap responsive navigation bar. -->
-    <nav class="navbar navbar-expand-lg bg-light position-relative">
+    <nav class="navbar navbar-expand-lg bg-light">
       <div class="container">
+
         <!-- When user click the website name, the web will return the user to the Home page. -->
-        <RouterLink class="navbar-brand" to="/">
-          GreenUp Melbourne
+        <RouterLink class="navbar-brand d-flex align-items-center" to="/">
+          <span class="brand-icon">🌱</span>
+          <span class="brand-name">GreenUp Melbourne</span>
         </RouterLink>
 
         <!-- This button will appear on a smaller screens for opening and closing the navigation menu. -->
@@ -54,13 +56,28 @@ window.addEventListener('auth-changed', updateCurrentUser)
         <!-- ms-auto will move the links to the right side of the page. -->
         <div class="collapse navbar-collapse" id="mainNavbar">
           <div class="navbar-nav ms-auto">
-            <RouterLink class="nav-link" to="/">Home</RouterLink>
-            <RouterLink class="nav-link" to="/explore">Explore</RouterLink>
-            <RouterLink class="nav-link" to="/biodiversity-resources">Biodiversity & Resources</RouterLink>
-            <RouterLink class="nav-link" to="/about">About Us</RouterLink>
-            <RouterLink class="nav-link" to="/my-account">My Account</RouterLink>
-            
-            <!-- Show the Admin link only to admin users. -->
+
+            <RouterLink class="nav-link" to="/">
+              Home
+            </RouterLink>
+
+            <RouterLink class="nav-link" to="/explore">
+              Explore
+            </RouterLink>
+
+            <RouterLink class="nav-link" to="/biodiversity-resources">
+              Biodiversity & Resources
+            </RouterLink>
+
+            <RouterLink class="nav-link" to="/about">
+              About Us
+            </RouterLink>
+
+            <RouterLink class="nav-link" to="/my-account">
+              My Account
+            </RouterLink>
+
+            <!-- Show the Admin link only to the admin users. -->
             <RouterLink
               v-if="currentUser && currentUser.role === 'admin'"
               class="nav-link"
@@ -68,52 +85,160 @@ window.addEventListener('auth-changed', updateCurrentUser)
             >
               Admin
             </RouterLink>
+
           </div>
         </div>
       </div>
     </nav>
   </header>
 
-<!-- Displays the current page(flex-grow-1 ensures the footer will always be at the bottom). -->
-<RouterView class="flex-grow-1" />
+  <!-- Displays the current page(flex-grow-1 ensures the footer will always be at the bottom). -->
+  <RouterView class="flex-grow-1" />
 
-<footer class="bg-success text-white mt-5 py-4">
-  <div class="container">
-    <p class="mb-2">© 2026 GreenUp Melbourne</p>
+  <footer class="bg-success text-white mt-5 py-3">
+    <div class="container">
 
-    <div class="footer-links">
-      <RouterLink class="text-white me-3" to="/">Home</RouterLink>
-      <RouterLink class="text-white me-3" to="/explore">Explore</RouterLink>
-      <RouterLink class="text-white me-3" to="/biodiversity-resources">
-        Biodiversity & Resources
-      </RouterLink>
-      <RouterLink class="text-white me-3" to="/about">About Us</RouterLink>
-      <RouterLink class="text-white me-3" to="/my-account">My Account</RouterLink>
+      <div
+        class="d-flex flex-column flex-lg-row
+               align-items-lg-center justify-content-between"
+      >
+
+        <div class="d-flex align-items-center mb-3 mb-lg-0">
+          <span class="footer-icon">🌱</span>
+
+          <div>
+            <div class="fw-semibold">
+              GreenUp Melbourne
+            </div>
+
+            <small>
+              © 2026 GreenUp Melbourne
+            </small>
+          </div>
+        </div>
+
+        <div class="footer-links">
+
+          <RouterLink class="text-white" to="/">
+            Home
+          </RouterLink>
+
+          <RouterLink class="text-white" to="/explore">
+            Explore
+          </RouterLink>
+
+          <RouterLink class="text-white" to="/biodiversity-resources">
+            Biodiversity & Resources
+          </RouterLink>
+
+          <RouterLink class="text-white" to="/about">
+            About Us
+          </RouterLink>
+
+          <RouterLink class="text-white" to="/my-account">
+            My Account
+          </RouterLink>
+
+          <!-- Show the Admin link only to admin users. -->
+          <RouterLink
+            v-if="currentUser && currentUser.role === 'admin'"
+            class="text-white"
+            to="/admin"
+          >
+            Admin
+          </RouterLink>
+
+        </div>
+      </div>
     </div>
-  </div>
-</footer>
+  </footer>
 </template>
 
 <style scoped>
-nav a 
-{
-  margin-right: 20px;
+.navbar {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.navbar-brand {
+  margin-right: 30px;
+}
+
+.brand-icon {
+  font-size: 28px;
+  margin-right: 10px;
+}
+
+.brand-name {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.nav-link {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.nav-link:hover {
+  color: #198754;
+}
+
+.router-link-active.nav-link {
+  color: #198754;
+  font-weight: 600;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+.footer-icon {
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .footer-links a {
+  text-decoration: none;
   white-space: nowrap;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
 }
 
 /* Keep the page content in place when open the hamburger menu. */
 @media (max-width: 991.98px) {
   #mainNavbar {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #f8f9fa;
-    padding: 10px 20px;
-    z-index: 1000;
+    padding-top: 15px;
+  }
+
+  .nav-link {
+    margin-left: 0;
+    margin-right: 0;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 10px 18px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .footer-links {
+    margin-top: 5px;
+    gap: 8px 16px;
   }
 }
 </style>
