@@ -6,7 +6,8 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut
+  signOut,
+  onAuthStateChanged
 } from 'firebase/auth'
 
 import '../firebase.js'
@@ -42,11 +43,34 @@ const accountMode = ref('login')
 // Store the currently login user.
 const currentUser = ref(null)
 
-// Restore the current user from local storage after refreshing the page.
-const savedCurrentUser = localStorage.getItem('currentUser')
-if (savedCurrentUser) {
-  currentUser.value = JSON.parse(savedCurrentUser)
-}
+// Check whether Firebase has finished loading the user.
+const authLoading = ref(true)
+
+// Update the current user when the Firebase login state changes.
+onAuthStateChanged(auth, (firebaseUser) => {
+  if (firebaseUser) {
+    const role =
+      firebaseUser.email === 'admin@greenup.com'
+        ? 'admin'
+        : 'user'
+
+    const user = {
+      email: firebaseUser.email,
+      uid: firebaseUser.uid,
+      role: role
+    }
+
+    currentUser.value = user
+    localStorage.setItem('currentUser', JSON.stringify(user))
+  } else {
+    currentUser.value = null
+    localStorage.removeItem('currentUser')
+  }
+
+  authLoading.value = false
+
+  window.dispatchEvent(new Event('auth-changed'))
+})
 
 // email must be string@string.string.
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -204,8 +228,13 @@ const logout = async () => {
     <div class="row">
       <div class="col-12 col-md-8 col-lg-6">
 
+        <!-- Show a message while Firebase checks the login state. -->
+        <div v-if="authLoading">
+          <p>Loading account...</p>
+        </div>
+
         <!-- Show Login and Register forms when no user is logged in. -->
-        <div v-if="!currentUser">
+        <div v-else-if="!currentUser">
           <div class="mb-4">
             <button
               type="button"
