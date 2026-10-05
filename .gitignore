@@ -1,2 +1,7 @@
 **/.git_backup/
 **/node_modules/
+
+# Local AI/tool configuration
+yzhu-library-w4/.agents/
+yzhu-library-w4/.claude/
+yzhu-library-w4/skills-lock.json
