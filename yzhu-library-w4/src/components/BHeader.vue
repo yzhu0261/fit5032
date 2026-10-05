@@ -34,6 +34,39 @@
             Add Book
           </router-link>
         </li>
+
+        <!-- Get Book Count page for Week 9 -->
+        <li class="nav-item">
+          <router-link
+            to="/getbookcount"
+            class="nav-link"
+            active-class="active"
+          >
+            Get Book Count
+          </router-link>
+        </li>
+
+        <!-- Count Book API page for Week 10 -->
+        <li class="nav-item">
+          <router-link
+            to="/CountBookAPI"
+            class="nav-link"
+            active-class="active"
+          >
+            Count Book API
+          </router-link>
+        </li>
+
+        <!-- Get Weather page for Week 10 -->
+        <li class="nav-item">
+          <router-link
+            to="/WeatherCheck"
+            class="nav-link"
+            active-class="active"
+          >
+            Get Weather
+          </router-link>
+        </li>
  
         <li class="nav-item"> 
           <a href="#" class="nav-link">Contact us</a> 

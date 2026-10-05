@@ -42,7 +42,6 @@ const fetchBooks = async () => {
       collection(db, 'books'),
       where('isbn', '>', 1000),
       orderBy('isbn', 'asc'),
-      limit(3)
     )
 
     const querySnapshot = await getDocs(q)

@@ -10,12 +10,18 @@
     "lint": "run-s \"lint:*\"",
     "lint:oxlint": "oxlint . --fix",
     "lint:eslint": "eslint . --fix --cache",
-    "format": "prettier --write --experimental-cli src/"
+    "format": "prettier --write --experimental-cli src/",
+    "start": "node server.js"
   },
   "dependencies": {
     "@primeuix/themes": "^3.0.0",
+    "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "firebase": "^12.18.0",
+    "firebase-admin": "^14.5.0",
+    "firebase-functions": "^7.4.0",
     "primevue": "^5.0.1",
     "vue": "^3.5.40",
     "vue-router": "^5.2.0"

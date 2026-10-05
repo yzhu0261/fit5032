@@ -10,6 +10,14 @@ import FirebaseSigninView from '../views/FirebaseSigninView.vue'
 import { isAuthenticated } from '../auth'
 
 import AddBookView from '../views/AddBookView.vue'
+import GetBookCountView from '../views/GetBookCountView.vue'
+
+// eFolio 10 - Weather API page
+import WeatherView from '../views/WeatherView.vue'
+
+import CountBookAPI from '../views/CountBookAPI.vue'
+
+import GetAllBookAPI from '../views/GetAllBookAPI.vue'
 
 const routes = [
   {
@@ -45,6 +53,28 @@ const routes = [
     name: 'AddBook',
     component: AddBookView
   },
+  {
+    path: '/getbookcount',
+    name: 'GetBookCount',
+    component: GetBookCountView
+  },
+
+  // eFolio 10 - Weather API route
+  {
+    path: '/WeatherCheck',
+    name: 'WeatherCheck',
+    component: WeatherView
+  },
+  {
+    path: '/CountBookAPI',
+    name: 'CountBookAPI',
+    component: CountBookAPI
+  },
+  {
+    path: '/GetAllBookAPI',
+    name: 'GetAllBookAPI',
+    component: GetAllBookAPI
+  }
 ]
 
 const router = createRouter({
