@@ -1,32 +1,77 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
-const logger = require("firebase-functions/logger");
+const { setGlobalOptions } = require("firebase-functions");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineSecret } = require("firebase-functions/params");
+const sgMail = require("@sendgrid/mail");
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({ maxInstances: 10 });
+setGlobalOptions({ maxInstances: 2 });
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+// Read the SendGrid API key from Firebase Secret Manager.
+const sendgridApiKey = defineSecret("SENDGRID_API_KEY");
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+// Send an email using SendGrid.
+exports.sendEmail = onCall(
+  {
+    secrets: [sendgridApiKey],
+    maxInstances: 2,
+  },
+  async (request) => {
+    // Only signed-in users can send emails.
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Please log in first.");
+    }
+
+    const { to, subject, message, attachment } = request.data || {};
+
+    // Check the required email fields.
+    if (
+      typeof to !== "string" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to) ||
+      typeof subject !== "string" ||
+      !subject.trim() ||
+      typeof message !== "string" ||
+      !message.trim()
+    ) {
+      throw new HttpsError("invalid-argument", "Invalid email details.");
+    }
+
+    // Check the attachment before sending.
+    if (
+      !attachment ||
+      typeof attachment.filename !== "string" ||
+      typeof attachment.content !== "string" ||
+      typeof attachment.type !== "string" ||
+      !attachment.filename.trim() ||
+      attachment.content.length > 1400000 ||
+      !/^[A-Za-z0-9+/]+={0,2}$/.test(attachment.content) ||
+      !["application/pdf", "text/plain", "text/csv"].includes(attachment.type)
+    ) {
+      throw new HttpsError("invalid-argument", "Invalid attachment.");
+    }
+
+    sgMail.setApiKey(sendgridApiKey.value());
+
+    const email = {
+      to: to.trim(),
+      from: "andnic5566@gmail.com",
+      subject: subject.trim().slice(0, 150),
+      text: message.trim().slice(0, 5000),
+      attachments: [
+        {
+          content: attachment.content,
+          filename: attachment.filename.slice(0, 100),
+          type: attachment.type,
+          disposition: "attachment",
+        },
+      ],
+    };
+
+    try {
+      await sgMail.send(email);
+      return { success: true, message: "Email sent successfully." };
+    } catch (error) {
+      console.error("Email sending failed:", error.message);
+      throw new HttpsError("internal", "Unable to send email.");
+    }
+  }
+);
