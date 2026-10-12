@@ -38,6 +38,13 @@ const router = createRouter
         component: () => import('../views/MyAccountView.vue'),
       },
 
+      // Email page for sending messages with attachments.
+      {
+        path: '/send-email',
+        name: 'send-email',
+        component: () => import('../views/SendEmailView.vue'),
+      },
+
       // Only admin users are allowed to access admin page.
       {
         path: '/admin',
