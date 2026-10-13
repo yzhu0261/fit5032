@@ -1,6 +1,10 @@
 <!-- This page helps users find suitable environmental activities. -->
 <script setup>
 import { ref, computed } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import { FilterMatchMode } from '@primevue/core/api'
+
 // Store the activity type.
 const selectedType = ref('All')
 
@@ -27,7 +31,71 @@ const activities = [
     date: '27 September 2026',
     type: 'Restoration'
   },
+  {
+    id: 4,
+    name: 'Native Tree Planting',
+    location: 'Box Hill',
+    date: '3 October 2026',
+    type: 'Tree Planting'
+  },
+  {
+    id: 5,
+    name: 'Community Garden Workshop',
+    location: 'Carlton',
+    date: '10 October 2026',
+    type: 'Gardening'
+  },
+  {
+    id: 6,
+    name: 'Creek Habitat Restoration',
+    location: 'Oakleigh',
+    date: '17 October 2026',
+    type: 'Restoration'
+  },
+  {
+    id: 7,
+    name: 'Local Park Tree Planting',
+    location: 'Glen Waverley',
+    date: '24 October 2026',
+    type: 'Tree Planting'
+  },
+  {
+    id: 8,
+    name: 'Sustainable Gardening Day',
+    location: 'Fitzroy',
+    date: '31 October 2026',
+    type: 'Gardening'
+  },
+  {
+    id: 9,
+    name: 'Wetland Restoration',
+    location: 'Scoresby',
+    date: '7 November 2026',
+    type: 'Restoration'
+  },
+  {
+    id: 10,
+    name: 'Neighbourhood Tree Planting',
+    location: 'Burwood',
+    date: '14 November 2026',
+    type: 'Tree Planting'
+  },
+  {
+    id: 11,
+    name: 'Urban Gardening Workshop',
+    location: 'Prahran',
+    date: '21 November 2026',
+    type: 'Gardening'
+  },
+  {
+    id: 12,
+    name: 'Wildlife Habitat Restoration',
+    location: 'Ringwood',
+    date: '28 November 2026',
+    type: 'Restoration'
+  }
 ]
+
 
 // Store the ratings.
 const ratings = ref({})
@@ -150,17 +218,37 @@ const getAverageRating = (activityId) => {
   return (total / activityRatings.length).toFixed(1)
 }
 
-// Filter activities according to the type selected by the user.
-const filteredAct = computed(() => 
-{
-  if (selectedType.value === 'All') 
-  {
+// Filter activities by type.
+const filteredAct = computed(() => {
+  if (selectedType.value === 'All') {
     return activities
   }
 
   return activities.filter(
     activity => activity.type === selectedType.value
   )
+})
+
+// Show three activity cards per page.
+const cardPage = ref(1)
+const cardsPerPage = 3
+
+const totalCardPages = computed(() =>
+  Math.ceil(filteredAct.value.length / cardsPerPage)
+)
+
+const paginatedActivities = computed(() => {
+  const start = (cardPage.value - 1) * cardsPerPage
+  return filteredAct.value.slice(start, start + cardsPerPage)
+})
+
+// Store the table filters.
+const tableFilters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  location: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  date: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
 </script>
@@ -177,6 +265,7 @@ const filteredAct = computed(() =>
       <select
         id="activityType"
         v-model="selectedType"
+        @change="cardPage = 1"
         class="form-select"
       >
         <option value="All">All</option>
@@ -191,7 +280,7 @@ const filteredAct = computed(() =>
       <!--v-bind:key gives each activities a special identifier.-->
       <!-- col-12 col-md-6 col-lg-4 mb-4: 1 card on small screens, 2 on medium, 3 on large screens -->
       <div
-        v-for="activity in filteredAct"
+        v-for="activity in paginatedActivities"
         v-bind:key="activity.id"
         class="col-12 col-md-6 col-lg-4 mb-4"
       >
@@ -267,6 +356,118 @@ const filteredAct = computed(() =>
         </div>
       </div>
     </div>
+
+    <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
+      <button
+        type="button"
+        class="btn btn-outline-success"
+        :disabled="cardPage === 1"
+        @click="cardPage--"
+      >
+        Previous
+      </button>
+
+      <span>Page {{ cardPage }} of {{ totalCardPages }}</span>
+
+      <button
+        type="button"
+        class="btn btn-outline-success"
+        :disabled="cardPage === totalCardPages"
+        @click="cardPage++"
+      >
+        Next
+      </button>
+    </div>
+  
+    <section class="mt-5">
+      <h2 class="h4 mb-3">Community Activities Directory</h2>
+
+      <DataTable
+        :value="activities"
+        dataKey="id"
+        v-model:filters="tableFilters"
+        :globalFilterFields="['name', 'type', 'location', 'date']"
+        filterDisplay="row"
+        paginator
+        :rows="5"
+        :rowsPerPageOptions="[5, 10]"
+        stripedRows
+        showGridlines
+      >
+        <template #header>
+          <div class="d-flex justify-content-end">
+            <input
+              v-model="tableFilters.global.value"
+              type="text"
+              class="form-control w-auto"
+              placeholder="Search all activities"
+              aria-label="Search all activities"
+            />
+          </div>
+        </template>
+
+        <Column field="name" header="Activity Name" sortable>
+          <template #filter="{ filterModel, filterCallback }">
+            <input
+              v-model="filterModel.value"
+              type="text"
+              class="form-control"
+              placeholder="Search name"
+              aria-label="Search activity name"
+              @input="filterCallback()"
+            />
+          </template>
+        </Column>
+
+        <Column field="type" header="Activity Type" sortable>
+          <template #filter="{ filterModel, filterCallback }">
+            <input
+              v-model="filterModel.value"
+              type="text"
+              class="form-control"
+              placeholder="Search type"
+              aria-label="Search activity type"
+              @input="filterCallback()"
+            />
+          </template>
+        </Column>
+
+        <Column field="location" header="Location" sortable>
+          <template #filter="{ filterModel, filterCallback }">
+            <input
+              v-model="filterModel.value"
+              type="text"
+              class="form-control"
+              placeholder="Search location"
+              aria-label="Search activity location"
+              @input="filterCallback()"
+            />
+          </template>
+        </Column>
+
+        <Column
+          field="date"
+          header="Date"
+          sortable
+          :sortField="(activity) => new Date(activity.date).getTime()"
+        >
+          <template #filter="{ filterModel, filterCallback }">
+            <input
+              v-model="filterModel.value"
+              type="text"
+              class="form-control"
+              placeholder="Search date"
+              aria-label="Search activity date"
+              @input="filterCallback()"
+            />
+          </template>
+        </Column>
+
+        <template #empty>
+          No activities found.
+        </template>
+      </DataTable>
+    </section>
   </main>
 </template>
 
