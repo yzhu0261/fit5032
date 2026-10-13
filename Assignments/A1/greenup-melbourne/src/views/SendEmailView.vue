@@ -92,16 +92,10 @@ const sendEmail = async () => {
     // Wait for Firebase to restore the login state.
     await auth.authStateReady()
 
-    console.log('Firebase current user:', auth.currentUser?.email)
-
     if (!auth.currentUser) {
       sendMessage.value = 'Please log in before sending an email.'
       return
     }
-
-    // Check whether Firebase can provide an authentication token.
-    const token = await auth.currentUser.getIdToken()
-    console.log('Firebase token available:', Boolean(token))
 
     // Convert the selected file into Base64.
     const base64 = await convertToBase64(attachment.value)
