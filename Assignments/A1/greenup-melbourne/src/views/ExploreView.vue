@@ -5,6 +5,9 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
 
+// Import the activity map component.
+import ActivityMap from '../components/ActivityMap.vue'
+
 // Store the activity type.
 const selectedType = ref('All')
 
@@ -468,6 +471,9 @@ const tableFilters = ref({
         </template>
       </DataTable>
     </section>
+
+    <!-- Display the interactive activity map. -->
+      <ActivityMap />
   </main>
 </template>
 
