@@ -180,11 +180,11 @@ window.addEventListener('auth-changed', updateCurrentUser)
 }
 
 .nav-link:hover {
-  color: #198754;
+  color: #146c43;
 }
 
 .router-link-active.nav-link {
-  color: #198754;
+  color: #146c43;
   font-weight: 600;
 }
 
