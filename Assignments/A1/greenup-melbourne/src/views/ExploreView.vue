@@ -4,6 +4,8 @@ import { ref, computed } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
+import { jsPDF } from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 // Import the activity map component.
 import ActivityMap from '../components/ActivityMap.vue'
@@ -254,6 +256,75 @@ const tableFilters = ref({
   date: { value: null, matchMode: FilterMatchMode.CONTAINS }
 })
 
+// Export the activity data as a CSV file.
+const exportCSV = () => {
+  const headers = ['Activity Name', 'Activity Type', 'Location', 'Date']
+
+  const rows = activities.map((activity) => [
+    activity.name,
+    activity.type,
+    activity.location,
+    activity.date
+  ])
+
+  // Escape values so commas and quotes are handled correctly.
+  const escapeCSV = (value) =>
+    `"${String(value).replace(/"/g, '""')}"`
+
+  const csvContent = [
+    headers.map(escapeCSV).join(','),
+    ...rows.map((row) => row.map(escapeCSV).join(','))
+  ].join('\r\n')
+
+  // Create and download the CSV file.
+  const blob = new Blob(['\uFEFF', csvContent], {
+    type: 'text/csv;charset=utf-8;'
+  })
+
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = 'greenup-activities.csv'
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
+// Export all activities as a PDF table.
+const exportPDF = () => {
+  const doc = new jsPDF()
+
+  // Add a title to the PDF.
+  doc.setFontSize(18)
+  doc.text('GreenUp Melbourne - Community Activities', 14, 20)
+
+  // Prepare the activity data.
+  const rows = activities.map((activity) => [
+    activity.name,
+    activity.type,
+    activity.location,
+    activity.date
+  ])
+
+  // Add the activity table.
+  autoTable(doc, {
+    head: [['Activity Name', 'Activity Type', 'Location', 'Date']],
+    body: rows,
+    startY: 30,
+    theme: 'striped',
+    styles: {
+      fontSize: 9
+    },
+    headStyles: {
+      fillColor: [46, 125, 80]
+    }
+  })
+
+  // Download the PDF file.
+  doc.save('greenup-activities.pdf')
+}
+
 </script>
 
 <template>
@@ -384,6 +455,25 @@ const tableFilters = ref({
   
     <section class="mt-5">
       <h2 class="h4 mb-3">Community Activities Directory</h2>
+
+    <!-- Download the activity data as CSV. -->
+    <div class="mb-3">
+      <button
+        type="button"
+        class="btn btn-success"
+        @click="exportCSV"
+      >
+        Export CSV
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-outline-success ms-2"
+        @click="exportPDF"
+      >
+        Export PDF
+      </button>
+    </div>
 
       <DataTable
         :value="activities"

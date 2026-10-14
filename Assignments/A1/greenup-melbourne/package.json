@@ -12,6 +12,8 @@
     "@primevue/themes": "^4.5.4",
     "bootstrap": "^5.3.8",
     "firebase": "^12.19.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "leaflet": "^1.9.4",
     "primevue": "^4.5.5",
     "vue": "^3.5.40",
