@@ -78,6 +78,9 @@ const filters = ref({
 <DataTable
   :value="resources"
   dataKey="id"
+  scrollable
+  scrollDirection="horizontal"
+  :tableStyle="{ minWidth: '650px' }"
   v-model:filters="filters"
   :globalFilterFields="['name', 'category', 'location']"
   filterDisplay="row"
@@ -99,7 +102,7 @@ const filters = ref({
     </div>
   </template>
 
-  <Column field="name" header="Resource Name" sortable>
+  <Column field="name" header="Resource Name" sortable style="min-width: 220px">
     <template #filter="{ filterModel, filterCallback }">
       <input
         v-model="filterModel.value"
@@ -112,7 +115,7 @@ const filters = ref({
     </template>
   </Column>
 
-  <Column field="category" header="Category" sortable>
+  <Column field="category" header="Category" sortable style="min-width: 200px">
     <template #filter="{ filterModel, filterCallback }">
       <input
         v-model="filterModel.value"
@@ -125,7 +128,7 @@ const filters = ref({
     </template>
   </Column>
 
-  <Column field="location" header="Location" sortable>
+  <Column field="location" header="Location" sortable style="min-width: 200px">
     <template #filter="{ filterModel, filterCallback }">
       <input
         v-model="filterModel.value"

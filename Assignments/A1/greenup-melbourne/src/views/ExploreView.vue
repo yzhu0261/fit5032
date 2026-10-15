@@ -433,6 +433,9 @@ const exportPDF = () => {
       <DataTable
         :value="activities"
         dataKey="id"
+        scrollable
+        scrollDirection="horizontal"
+        :tableStyle="{ minWidth: '880px' }"
         v-model:filters="tableFilters"
         :globalFilterFields="['name', 'type', 'location', 'date']"
         filterDisplay="row"
@@ -454,7 +457,7 @@ const exportPDF = () => {
           </div>
         </template>
 
-        <Column field="name" header="Activity Name" sortable>
+        <Column field="name" header="Activity Name" sortable style="min-width: 220px">
           <template #filter="{ filterModel, filterCallback }">
             <input
               v-model="filterModel.value"
@@ -467,7 +470,7 @@ const exportPDF = () => {
           </template>
         </Column>
 
-        <Column field="type" header="Activity Type" sortable>
+        <Column field="type" header="Activity Type" sortable style="min-width: 220px">
           <template #filter="{ filterModel, filterCallback }">
             <input
               v-model="filterModel.value"
@@ -480,7 +483,7 @@ const exportPDF = () => {
           </template>
         </Column>
 
-        <Column field="location" header="Location" sortable>
+        <Column field="location" header="Location" sortable style="min-width: 220px">
           <template #filter="{ filterModel, filterCallback }">
             <input
               v-model="filterModel.value"
@@ -497,6 +500,7 @@ const exportPDF = () => {
           field="date"
           header="Date"
           sortable
+          style="min-width: 220px"
           :sortField="(activity) => new Date(activity.date).getTime()"
         >
           <template #filter="{ filterModel, filterCallback }">

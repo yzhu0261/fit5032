@@ -378,7 +378,7 @@ onMounted(async () => {
         </p>
 
         <div v-else class="table-responsive">
-          <table class="table table-striped table-hover">
+          <table class="table table-striped table-hover" style="min-width: 750px;">
             <thead>
               <tr>
                 <th scope="col">Email</th>
@@ -489,7 +489,7 @@ onMounted(async () => {
         </p>
 
         <div v-else class="table-responsive">
-          <table class="table table-striped table-hover">
+          <table class="table table-striped table-hover" style="min-width: 750px;">
             <thead>
               <tr>
                 <th scope="col">Name</th>
