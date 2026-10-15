@@ -18,6 +18,8 @@ const gardeningCount = computed(
 
 // Load registered user statistics from Firebase.
 const totalUsers = ref(null)
+const adminUsers = ref(null)
+const regularUsers = ref(null)
 const userStatsError = ref('')
 
 onMounted(async () => {
@@ -27,6 +29,8 @@ onMounted(async () => {
     const result = await getUserStats()
 
     totalUsers.value = result.data.totalUsers
+    adminUsers.value = result.data.adminUsers
+    regularUsers.value = result.data.regularUsers
   } catch (error) {
     userStatsError.value = 'Unable to load user statistics.'
     console.error(error)
@@ -83,6 +87,36 @@ onMounted(async () => {
         <p v-else class="display-6 mb-0">
           {{ totalUsers === null ? 'Loading...' : totalUsers }}
         </p>
+      </div>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12 col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h6">Admin Users</h2>
+            <p v-if="userStatsError" class="text-danger mb-0">
+              {{ userStatsError }}
+            </p>
+            <p v-else class="display-6 mb-0">
+              {{ adminUsers === null ? 'Loading...' : adminUsers }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h6">Regular Users</h2>
+            <p v-if="userStatsError" class="text-danger mb-0">
+              {{ userStatsError }}
+            </p>
+            <p v-else class="display-6 mb-0">
+              {{ regularUsers === null ? 'Loading...' : regularUsers }}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 

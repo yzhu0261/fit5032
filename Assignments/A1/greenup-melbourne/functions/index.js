@@ -109,14 +109,27 @@ exports.getUserStats = onCall(
       }
 
       let totalUsers = 0;
+      let adminUsers = 0;
       let nextPageToken;
 
       do {
         const result = await getAuth().listUsers(1000, nextPageToken);
+
         totalUsers += result.users.length;
+
+        adminUsers += result.users.filter(
+            (user) => user.uid === adminUid,
+        ).length;
+
         nextPageToken = result.pageToken;
       } while (nextPageToken);
 
-      return {totalUsers};
+      const regularUsers = totalUsers - adminUsers;
+
+      return {
+        totalUsers,
+        adminUsers,
+        regularUsers,
+      };
     },
 );
