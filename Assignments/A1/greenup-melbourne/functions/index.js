@@ -5,6 +5,7 @@ const {defineSecret} = require("firebase-functions/params");
 const sgMail = require("@sendgrid/mail");
 
 const {getAuth} = require("firebase-admin/auth");
+const {getFirestore} = require("firebase-admin/firestore");
 const {initializeApp} = require("firebase-admin/app");
 
 initializeApp();
@@ -90,6 +91,67 @@ exports.sendEmail = onCall(
     },
 );
 
+// Upload the activity data to Firestore.
+exports.uploadActivities = onCall(async (request) => {
+  // Only the administrator can upload activity data.
+  const adminUid = "i6jBpRTLa0dfcphE6n4UjqRNiJS2";
+
+  if (!request.auth || request.auth.uid !== adminUid) {
+    throw new HttpsError("permission-denied", "Admin access required.");
+  }
+
+  const activities = request.data ? request.data.activities : null;
+
+  // Check that the activity list is valid.
+  if (
+    !Array.isArray(activities) ||
+    activities.length === 0 ||
+    activities.length > 100
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid activity list.");
+  }
+
+  // Check the required fields of each activity.
+  const validActivities = activities.every((activity) =>
+    activity &&
+    Number.isInteger(activity.id) &&
+    activity.id >= 1 &&
+    typeof activity.name === "string" &&
+    activity.name.trim() !== "" &&
+    typeof activity.type === "string" &&
+    ["Tree Planting", "Gardening", "Restoration"].includes(activity.type) &&
+    typeof activity.location === "string" &&
+    activity.location.trim() !== "" &&
+    typeof activity.date === "string" &&
+    activity.date.trim() !== "",
+  );
+
+  // Check that activity IDs are unique.
+  const uniqueIds = new Set(activities.map((activity) => activity.id));
+
+  if (!validActivities || uniqueIds.size !== activities.length) {
+    throw new HttpsError("invalid-argument", "Invalid activity data.");
+  }
+
+  const db = getFirestore();
+  const batch = db.batch();
+
+  activities.forEach((activity) => {
+    const activityRef = db.collection("activities").doc(String(activity.id));
+
+    batch.set(activityRef, {
+      name: activity.name,
+      type: activity.type,
+      location: activity.location,
+      date: activity.date,
+    });
+  });
+
+  await batch.commit();
+
+  return {success: true, count: activities.length};
+});
+
 // Get registered user statistics for the admin dashboard.
 exports.getUserStats = onCall(
     {maxInstances: 2},
@@ -133,3 +195,27 @@ exports.getUserStats = onCall(
       };
     },
 );
+
+// Get activity statistics from Firestore.
+exports.getActivityStats = onCall(async () => {
+  const snapshot = await getFirestore().collection("activities").get();
+
+  const counts = {
+    "Tree Planting": 0,
+    "Gardening": 0,
+    "Restoration": 0,
+  };
+
+  snapshot.forEach((doc) => {
+    const type = doc.data().type;
+
+    if (Object.prototype.hasOwnProperty.call(counts, type)) {
+      counts[type]++;
+    }
+  });
+
+  return {
+    totalActivities: snapshot.size,
+    counts,
+  };
+});
