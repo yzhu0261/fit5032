@@ -4,11 +4,34 @@ import { ref } from 'vue'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import { getAuth } from 'firebase/auth'
 import app from '../firebase.js'
+import { useRoute } from 'vue-router'
 
 // Store the email form details.
 const recipient = ref('')
 const subject = ref('')
+
+const route = useRoute()
+
+if (typeof route.query.activity === 'string') {
+  subject.value = `Join me for ${route.query.activity}!`
+}
+
 const message = ref('')
+
+if (typeof route.query.activity === 'string') {
+  message.value = `Hi,
+
+I found this environmental activity on GreenUp Melbourne and thought you might be interested!
+
+Activity: ${route.query.activity}
+Location: ${route.query.location || 'Not specified'}
+Date: ${route.query.date || 'Not specified'}
+
+Would you like to join me?
+
+Sent via GreenUp Melbourne.`
+}
+
 const attachment = ref(null)
 const fileError = ref('')
 
@@ -78,7 +101,7 @@ const convertToBase64 = (file) => {
 
 // Send the email using Firebase Cloud Functions.
 const sendEmail = async () => {
-  if (sending.value || !attachment.value) {
+  if (sending.value) {
     return
   }
 
@@ -98,18 +121,22 @@ const sendEmail = async () => {
     }
 
     // Convert the selected file into Base64.
-    const base64 = await convertToBase64(attachment.value)
+    const base64 = attachment.value
+  ? await convertToBase64(attachment.value)
+  : null
 
     // Send the email details to the Cloud Function.
     const result = await sendEmailFunction({
       to: recipient.value,
       subject: subject.value,
       message: message.value,
-      attachment: {
-        filename: attachment.value.name,
-        content: base64,
-        type: attachment.value.type
-      }
+      attachment: attachment.value
+        ? {
+            filename: attachment.value.name,
+            content: base64,
+            type: attachment.value.type
+          }
+        : null
     })
 
     if (result.data.success) {
@@ -138,7 +165,7 @@ const sendEmail = async () => {
     <h1 class="mb-2">Send Email</h1>
 
     <p class="text-muted mb-4">
-      Send an email with an attachment.
+      Share environmental activities with your friends by email. You can also include an attachment.
     </p>
 
     <div class="card shadow-sm">
@@ -199,7 +226,7 @@ const sendEmail = async () => {
           <!-- Email attachment -->
           <div class="mb-4">
             <label for="attachment" class="form-label">
-              Attachment
+              Attachment (Optional)
             </label>
 
             <input
@@ -207,7 +234,6 @@ const sendEmail = async () => {
               type="file"
               class="form-control"
               accept=".pdf,.txt,.csv"
-              required
               @change="handleFileChange"
             />
 

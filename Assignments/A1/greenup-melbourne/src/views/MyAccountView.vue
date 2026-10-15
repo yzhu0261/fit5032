@@ -439,13 +439,6 @@ const logout = async () => {
                   </span>
                 </div>
               </div>
-
-              <RouterLink
-                to="/send-email"
-                class="btn btn-success w-100 mb-3"
-              >
-                Send Email
-              </RouterLink>
               
               <button
                 type="button"

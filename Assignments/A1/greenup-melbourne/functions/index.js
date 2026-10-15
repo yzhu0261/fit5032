@@ -41,18 +41,8 @@ exports.sendEmail = onCall(
         throw new HttpsError("invalid-argument", "Invalid email details.");
       }
 
-      const testRecipient = "andnic5566@gmail.com";
-
-      if (to.trim().toLowerCase() !== testRecipient) {
-        throw new HttpsError(
-            "permission-denied",
-            "Only the test recipient is allowed.",
-        );
-      }
-
       // Check the attachment before sending.
-      if (
-        !attachment ||
+      if (attachment && (
         typeof attachment.filename !== "string" ||
         typeof attachment.content !== "string" ||
         typeof attachment.type !== "string" ||
@@ -60,7 +50,7 @@ exports.sendEmail = onCall(
         attachment.content.length > 1400000 ||
         !/^[A-Za-z0-9+/]+={0,2}$/.test(attachment.content) ||
         !["application/pdf", "text/plain", "text/csv"].includes(attachment.type)
-      ) {
+      )) {
         throw new HttpsError("invalid-argument", "Invalid attachment.");
       }
 
@@ -71,21 +61,26 @@ exports.sendEmail = onCall(
         from: "andnic5566@gmail.com",
         subject: subject.trim().slice(0, 150),
         text: message.trim().slice(0, 5000),
-        attachments: [
+      };
+
+      // Add the attachment only when a file is provided.
+      if (attachment) {
+        email.attachments = [
           {
             content: attachment.content,
             filename: attachment.filename.slice(0, 100),
             type: attachment.type,
             disposition: "attachment",
           },
-        ],
-      };
+        ];
+      }
 
       try {
         await sgMail.send(email);
         return {success: true, message: "Email sent successfully."};
       } catch (error) {
-        console.error("Email sending failed:", error.message);
+        console.error("Email sending failed:", error);
+        console.error("SendGrid response:", error.response?.body);
         throw new HttpsError("internal", "Unable to send email.");
       }
     },

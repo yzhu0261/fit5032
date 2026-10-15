@@ -319,6 +319,21 @@ const exportPDF = () => {
             <p>{{ activity.location }}</p>
             <p>{{ activity.type }}</p>
             <p>{{ activity.date }}</p>
+
+            <RouterLink
+              :to="{
+                path: '/send-email',
+                query: {
+                  activity: activity.name,
+                  location: activity.location,
+                  date: activity.date
+                }
+              }"
+              class="btn btn-outline-success btn-sm"
+            >
+              Share Activity
+            </RouterLink>
+            
             <div class="rating-section mt-4">
               <p class="mb-2 fw-semibold">Your Rating</p>
 
