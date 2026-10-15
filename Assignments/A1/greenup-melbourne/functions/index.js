@@ -1,6 +1,5 @@
-
 const {setGlobalOptions} = require("firebase-functions");
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {onCall, onRequest, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const sgMail = require("@sendgrid/mail");
 
@@ -218,4 +217,60 @@ exports.getActivityStats = onCall(async () => {
     totalActivities: snapshot.size,
     counts,
   };
+});
+
+// Return environmental activities as JSON.
+exports.getActivitiesAPI = onRequest(async (req, res) => {
+  if (req.method !== "GET") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  try {
+    const snapshot = await getFirestore().collection("activities").get();
+
+    const activities = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(activities);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: "Unable to load activities"});
+  }
+});
+
+// Return activity statistics as JSON.
+exports.getActivityStatsAPI = onRequest(async (req, res) => {
+  if (req.method !== "GET") {
+    res.status(405).json({error: "Method not allowed"});
+    return;
+  }
+
+  try {
+    const snapshot = await getFirestore().collection("activities").get();
+
+    const counts = {
+      "Tree Planting": 0,
+      "Gardening": 0,
+      "Restoration": 0,
+    };
+
+    snapshot.forEach((doc) => {
+      const type = doc.data().type;
+
+      if (Object.prototype.hasOwnProperty.call(counts, type)) {
+        counts[type]++;
+      }
+    });
+
+    res.status(200).json({
+      totalActivities: snapshot.size,
+      counts,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({error: "Unable to load activity statistics"});
+  }
 });
