@@ -1,6 +1,6 @@
 <!-- This page helps users find suitable environmental activities. -->
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
@@ -8,26 +8,43 @@ import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { activities as defaultActivities } from '../data/activities.js'
 
-// Save activity data when online and read the cache when offline.
-let activities = defaultActivities
+// Load activities from Firestore and cache them for offline use.
+const activities = ref(defaultActivities)
 
-if (navigator.onLine) {
-  localStorage.setItem('cachedActivities', JSON.stringify(defaultActivities))
-} else {
-  const cachedActivities = localStorage.getItem('cachedActivities')
+const cachedActivities = localStorage.getItem('cachedActivities')
 
-  if (cachedActivities) {
-    try {
-      const savedActivities = JSON.parse(cachedActivities)
+if (cachedActivities) {
+  try {
+    const savedActivities = JSON.parse(cachedActivities)
 
-      if (Array.isArray(savedActivities)) {
-        activities = savedActivities
-      }
-    } catch (error) {
-      console.error('Unable to read cached activities:', error)
+    if (Array.isArray(savedActivities)) {
+      activities.value = savedActivities
     }
+  } catch (error) {
+    console.error('Unable to read cached activities:', error)
   }
 }
+
+onMounted(async () => {
+  if (!navigator.onLine) return
+
+  try {
+    const response = await fetch(
+      'https://us-central1-greenup-melbourne-a3.cloudfunctions.net/getActivitiesAPI'
+    )
+
+    if (!response.ok) {
+      throw new Error('Unable to load activities.')
+    }
+
+    const latestActivities = await response.json()
+
+    activities.value = latestActivities
+    localStorage.setItem('cachedActivities', JSON.stringify(latestActivities))
+  } catch (error) {
+    console.error('Unable to update activities:', error)
+  }
+})
 
 // Import the activity map component.
 import ActivityMap from '../components/ActivityMap.vue'
@@ -45,7 +62,7 @@ if (savedRatings) {
 }
 
 // Ensure each activity has its own rating list.
-activities.forEach((activity) => {
+activities.value.forEach((activity) => {
 
   if (!ratings.value[activity.id]) {
     ratings.value[activity.id] = []
@@ -56,27 +73,27 @@ activities.forEach((activity) => {
 // Store the temporary rating when user hovers over these stars.
 const tempRatings = ref({})
 
-activities.forEach((activity) => {
+activities.value.forEach((activity) => {
   tempRatings.value[activity.id] = 0
 })
 // Store the rating selected by the user for each activity.
 const selectedRatings = ref({})
 
-activities.forEach((activity) => {
+activities.value.forEach((activity) => {
   selectedRatings.value[activity.id] = 0
 })
 
 // Store the rating submission message for each activity.
 const ratingMessages = ref({})
 
-activities.forEach((activity) => {
+activities.value.forEach((activity) => {
   ratingMessages.value[activity.id] = ''
 })
 
 // Store the type of rating message for each activity.
 const ratingMessageTypes = ref({})
 
-activities.forEach((activity) => {
+activities.value.forEach((activity) => {
   ratingMessageTypes.value[activity.id] = ''
 })
 
@@ -117,6 +134,10 @@ const submitRating = (activityId) => {
     return
   }
 
+  if (!ratings.value[activityId]) {
+    ratings.value[activityId] = []
+  }
+
   // Check whether the current user has already rated this activity.
   const existingRatingIndex = ratings.value[activityId].findIndex(
     (item) => item.email === currentUser.email
@@ -143,7 +164,7 @@ const submitRating = (activityId) => {
 
 // Calculate the average rating.
 const getAverageRating = (activityId) => {
-  const activityRatings = ratings.value[activityId]
+  const activityRatings = ratings.value[activityId] || []
 
   if (activityRatings.length === 0) 
   {
@@ -159,10 +180,10 @@ const getAverageRating = (activityId) => {
 // Filter activities by type.
 const filteredAct = computed(() => {
   if (selectedType.value === 'All') {
-    return activities
+    return activities.value
   }
 
-  return activities.filter(
+  return activities.value.filter(
     activity => activity.type === selectedType.value
   )
 })
@@ -193,7 +214,7 @@ const tableFilters = ref({
 const exportCSV = () => {
   const headers = ['Activity Name', 'Activity Type', 'Location', 'Date']
 
-  const rows = activities.map((activity) => [
+  const rows = activities.value.map((activity) => [
     activity.name,
     activity.type,
     activity.location,
@@ -233,7 +254,7 @@ const exportPDF = () => {
   doc.text('GreenUp Melbourne - Community Activities', 14, 20)
 
   // Prepare the activity data.
-  const rows = activities.map((activity) => [
+  const rows = activities.value.map((activity) => [
     activity.name,
     activity.type,
     activity.location,

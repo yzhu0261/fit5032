@@ -6,6 +6,7 @@ const sgMail = require("@sendgrid/mail");
 const {getAuth} = require("firebase-admin/auth");
 const {getFirestore} = require("firebase-admin/firestore");
 const {initializeApp} = require("firebase-admin/app");
+const admin = require("firebase-admin");
 
 initializeApp();
 
@@ -220,26 +221,28 @@ exports.getActivityStats = onCall(async () => {
 });
 
 // Return environmental activities as JSON.
-exports.getActivitiesAPI = onRequest(async (req, res) => {
-  if (req.method !== "GET") {
-    res.status(405).json({error: "Method not allowed"});
-    return;
-  }
+exports.getActivitiesAPI = onRequest(
+    {cors: true},
+    async (req, res) => {
+      if (req.method !== "GET") {
+        res.status(405).json({error: "Method not allowed"});
+        return;
+      }
 
-  try {
-    const snapshot = await getFirestore().collection("activities").get();
+      try {
+        const snapshot = await getFirestore().collection("activities").get();
 
-    const activities = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+        const activities = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
-    res.status(200).json(activities);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({error: "Unable to load activities"});
-  }
-});
+        res.status(200).json(activities);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({error: "Unable to load activities"});
+      }
+    });
 
 // Return activity statistics as JSON.
 exports.getActivityStatsAPI = onRequest(async (req, res) => {
@@ -273,4 +276,123 @@ exports.getActivityStatsAPI = onRequest(async (req, res) => {
     console.error(error);
     res.status(500).json({error: "Unable to load activity statistics"});
   }
+});
+
+// Add a new activity to Firestore.
+exports.addActivity = onCall(async (request) => {
+  const adminUid = "i6jBpRTLa0dfcphE6n4UjqRNiJS2";
+
+  if (!request.auth || request.auth.uid !== adminUid) {
+    throw new HttpsError("permission-denied", "Admin access required.");
+  }
+
+  const activity = request.data;
+
+  if (
+    !activity ||
+    typeof activity.name !== "string" ||
+    !activity.name.trim() ||
+    !["Tree Planting", "Gardening", "Restoration"].includes(activity.type) ||
+    typeof activity.location !== "string" ||
+    !activity.location.trim() ||
+    typeof activity.date !== "string" ||
+    !activity.date.trim()
+  ) {
+    throw new HttpsError("invalid-argument", "Invalid activity data.");
+  }
+
+  const db = getFirestore();
+  const activityRef = await db.collection("activities").add({
+    name: activity.name.trim(),
+    type: activity.type,
+    location: activity.location.trim(),
+    date: activity.date.trim(),
+  });
+
+  return {success: true, id: activityRef.id};
+});
+
+// Delete an activity from Firestore.
+exports.deleteActivity = onCall(async (request) => {
+  const adminUid = "i6jBpRTLa0dfcphE6n4UjqRNiJS2";
+
+  if (!request.auth || request.auth.uid !== adminUid) {
+    throw new HttpsError("permission-denied", "Admin access required.");
+  }
+
+  const activityId = request.data && request.data.id;
+
+  if (typeof activityId !== "string" || !activityId.trim()) {
+    throw new HttpsError("invalid-argument", "Invalid activity ID.");
+  }
+
+  const db = getFirestore();
+  const activityRef = db.collection("activities").doc(activityId);
+
+  const activityDoc = await activityRef.get();
+
+  if (!activityDoc.exists) {
+    throw new HttpsError("not-found", "Activity not found.");
+  }
+
+  await activityRef.delete();
+
+  return {success: true};
+});
+
+// Get registered users for the admin dashboard.
+exports.getUsers = onCall(async (request) => {
+  const adminUid = "i6jBpRTLa0dfcphE6n4UjqRNiJS2";
+
+  if (!request.auth || request.auth.uid !== adminUid) {
+    throw new HttpsError("permission-denied", "Admin access required.");
+  }
+
+  const users = [];
+  let nextPageToken;
+
+  do {
+    const result = await admin.auth().listUsers(1000, nextPageToken);
+
+    result.users.forEach((user) => {
+      users.push({
+        uid: user.uid,
+        email: user.email || "",
+        disabled: user.disabled,
+        role: user.uid === adminUid ? "Admin" : "Regular User",
+      });
+    });
+
+    nextPageToken = result.pageToken;
+  } while (nextPageToken);
+
+  return {users};
+});
+
+// Enable or disable a regular user account.
+exports.setUserDisabled = onCall(async (request) => {
+  const adminUid = "i6jBpRTLa0dfcphE6n4UjqRNiJS2";
+
+  if (!request.auth || request.auth.uid !== adminUid) {
+    throw new HttpsError("permission-denied", "Admin access required.");
+  }
+
+  const uid = request.data && request.data.uid;
+  const disabled = request.data && request.data.disabled;
+
+  if (typeof uid !== "string" || !uid.trim() ||
+      typeof disabled !== "boolean") {
+    throw new HttpsError("invalid-argument", "Invalid user data.");
+  }
+
+  if (uid === adminUid) {
+    throw new HttpsError(
+        "permission-denied",
+        "The admin account cannot be disabled.",
+    );
+  }
+
+  await admin.auth().updateUser(uid, {disabled});
+
+  return {success: true};
 });
