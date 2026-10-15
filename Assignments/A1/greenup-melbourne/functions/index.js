@@ -4,6 +4,11 @@ const {onCall, HttpsError} = require("firebase-functions/v2/https");
 const {defineSecret} = require("firebase-functions/params");
 const sgMail = require("@sendgrid/mail");
 
+const {getAuth} = require("firebase-admin/auth");
+const {initializeApp} = require("firebase-admin/app");
+
+initializeApp();
+
 setGlobalOptions({maxInstances: 2});
 
 // Read the SendGrid API key from Firebase Secret Manager.
@@ -35,7 +40,6 @@ exports.sendEmail = onCall(
         throw new HttpsError("invalid-argument", "Invalid email details.");
       }
 
-      // Only allow emails to the test recipient.
       const testRecipient = "andnic5566@gmail.com";
 
       if (to.trim().toLowerCase() !== testRecipient) {
@@ -83,5 +87,36 @@ exports.sendEmail = onCall(
         console.error("Email sending failed:", error.message);
         throw new HttpsError("internal", "Unable to send email.");
       }
+    },
+);
+
+// Get registered user statistics for the admin dashboard.
+exports.getUserStats = onCall(
+    {maxInstances: 2},
+    async (request) => {
+      if (!request.auth) {
+        throw new HttpsError("unauthenticated", "Please log in first.");
+      }
+
+      // Check the administrator's Firebase UID.
+      const adminUid = "i6jBpRTLa0dfcphE6n4UjqRNiJS2";
+
+      if (request.auth.uid !== adminUid) {
+        throw new HttpsError(
+            "permission-denied",
+            "Administrator access is required.",
+        );
+      }
+
+      let totalUsers = 0;
+      let nextPageToken;
+
+      do {
+        const result = await getAuth().listUsers(1000, nextPageToken);
+        totalUsers += result.users.length;
+        nextPageToken = result.pageToken;
+      } while (nextPageToken);
+
+      return {totalUsers};
     },
 );
