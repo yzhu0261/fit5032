@@ -33,7 +33,7 @@ window.addEventListener('auth-changed', updateCurrentUser)
 <template>
   <header>
     <!-- Bootstrap responsive navigation bar. -->
-    <nav class="navbar navbar-expand-lg bg-white">
+    <nav class="navbar navbar-expand-lg bg-white" aria-label="Main navigation">
       <div class="container">
 
         <!-- When user click the website name, the web will return the user to the Home page. -->

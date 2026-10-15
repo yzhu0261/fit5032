@@ -12,3 +12,9 @@
 a{
   text-decoration: none;
 }
+
+/* Make map attribution links easier to identify. */
+.leaflet-control-attribution a {
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+}

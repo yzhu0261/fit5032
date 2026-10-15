@@ -66,7 +66,9 @@ const updateMarkers = () => {
 
 onMounted(() => {
   // Create a map centred on Melbourne.
-  map = L.map(mapContainer.value).setView(
+  map = L.map(mapContainer.value, {
+    keyboard: false
+  }).setView(
     [-37.8136, 144.9631],
     11
   )

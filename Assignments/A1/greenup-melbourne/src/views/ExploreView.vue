@@ -329,11 +329,11 @@ const exportPDF = () => {
                   date: activity.date
                 }
               }"
-              class="btn btn-outline-success btn-sm"
+              class="btn btn-success btn-sm"
             >
               Share Activity
             </RouterLink>
-            
+
             <div class="rating-section mt-4">
               <p class="mb-2 fw-semibold">Your Rating</p>
 
@@ -404,7 +404,7 @@ const exportPDF = () => {
     <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
       <button
         type="button"
-        class="btn btn-outline-success"
+        class="btn btn-success"
         :disabled="cardPage === 1"
         @click="cardPage--"
       >
@@ -415,7 +415,7 @@ const exportPDF = () => {
 
       <button
         type="button"
-        class="btn btn-outline-success"
+        class="btn btn-success"
         :disabled="cardPage === totalCardPages"
         @click="cardPage++"
       >
@@ -438,7 +438,7 @@ const exportPDF = () => {
 
       <button
         type="button"
-        class="btn btn-outline-success ms-2"
+        class="btn btn-success ms-2"
         @click="exportPDF"
       >
         Export PDF
