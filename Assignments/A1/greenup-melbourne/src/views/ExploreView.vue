@@ -6,7 +6,28 @@ import Column from 'primevue/column'
 import { FilterMatchMode } from '@primevue/core/api'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
-import { activities } from '../data/activities.js'
+import { activities as defaultActivities } from '../data/activities.js'
+
+// Save activity data when online and read the cache when offline.
+let activities = defaultActivities
+
+if (navigator.onLine) {
+  localStorage.setItem('cachedActivities', JSON.stringify(defaultActivities))
+} else {
+  const cachedActivities = localStorage.getItem('cachedActivities')
+
+  if (cachedActivities) {
+    try {
+      const savedActivities = JSON.parse(cachedActivities)
+
+      if (Array.isArray(savedActivities)) {
+        activities = savedActivities
+      }
+    } catch (error) {
+      console.error('Unable to read cached activities:', error)
+    }
+  }
+}
 
 // Import the activity map component.
 import ActivityMap from '../components/ActivityMap.vue'
@@ -475,7 +496,7 @@ const exportPDF = () => {
     </section>
 
     <!-- Display the interactive activity map. -->
-      <ActivityMap />
+    <ActivityMap :activities="activities" />
   </main>
 </template>
 

@@ -2,6 +2,7 @@
 // Import RouterLink for navigation & RouteView for displaying.
 import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
+import NetworkStatus from './components/NetworkStatus.vue'
 
 // Store the current login user for getting the right navigation bar.
 const currentUser = ref(null)
@@ -92,7 +93,9 @@ window.addEventListener('auth-changed', updateCurrentUser)
     </nav>
   </header>
 
-  <!-- Displays the current page(flex-grow-1 ensures the footer will always be at the bottom). -->
+  <NetworkStatus />
+
+  <!-- Displays the current page. -->
   <RouterView class="flex-grow-1" />
 
   <footer class="bg-success text-white mt-5 py-3">
