@@ -1,6 +1,7 @@
 <!-- This page allows users to register, log in, and manage their account. -->
 <script setup>
 import { ref } from 'vue'
+import { UserRound } from 'lucide-vue-next'
 
 import {
   getAuth,
@@ -402,7 +403,7 @@ const logout = async () => {
                          align-items-center justify-content-center mb-3"
                   style="width: 72px; height: 72px;"
                 >
-                  <span class="fs-2">🌱</span>
+                  <UserRound :size="34" :stroke-width="1.8" class="text-success" />
                 </div>
 
                 <h2 class="h3 fw-bold mb-2">Welcome</h2>

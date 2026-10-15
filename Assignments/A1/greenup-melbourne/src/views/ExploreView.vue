@@ -282,7 +282,8 @@ const exportPDF = () => {
 </script>
 
 <template>
-  <main class="container py-5">
+  <main class="explore-page py-5">
+    <div class="container">
     <h1>Explore Activities</h1>
 
     <div class="mt-4 mb-4">
@@ -518,10 +519,51 @@ const exportPDF = () => {
 
     <!-- Display the interactive activity map. -->
     <ActivityMap :activities="activities" />
-  </main>
+      </div>
+    </main>
 </template>
 
 <style scoped>
+.explore-page {
+  background: #f7faf8;
+}
+
+main > h1 {
+  color: #174b32;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.card {
+  border: 1px solid #e1ebe3;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-body {
+  padding: 28px;
+}
+
+.card-body h2 {
+  color: #174b32;
+  font-weight: 700;
+}
+
+.card-body p {
+  color: #52665b;
+}
+
+main > section h2 {
+  color: #174b32;
+  font-weight: 700;
+}
+
 .star-button {
   border: none;
   background: transparent;

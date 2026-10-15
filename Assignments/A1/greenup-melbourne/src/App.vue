@@ -3,6 +3,7 @@
 import { ref } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import NetworkStatus from './components/NetworkStatus.vue'
+import { Leaf } from 'lucide-vue-next'
 
 // Store the current login user for getting the right navigation bar.
 const currentUser = ref(null)
@@ -32,12 +33,14 @@ window.addEventListener('auth-changed', updateCurrentUser)
 <template>
   <header>
     <!-- Bootstrap responsive navigation bar. -->
-    <nav class="navbar navbar-expand-lg bg-light">
+    <nav class="navbar navbar-expand-lg bg-white">
       <div class="container">
 
         <!-- When user click the website name, the web will return the user to the Home page. -->
         <RouterLink class="navbar-brand d-flex align-items-center" to="/">
-          <span class="brand-icon">🌱</span>
+          <span class="brand-icon">
+            <Leaf :size="24" :stroke-width="2.2" />
+          </span>
           <span class="brand-name">GreenUp Melbourne</span>
         </RouterLink>
 
@@ -98,7 +101,7 @@ window.addEventListener('auth-changed', updateCurrentUser)
   <!-- Displays the current page. -->
   <RouterView class="flex-grow-1" />
 
-  <footer class="bg-success text-white mt-5 py-3">
+  <footer class="bg-success text-white py-3">
     <div class="container">
 
       <div
@@ -107,7 +110,9 @@ window.addEventListener('auth-changed', updateCurrentUser)
       >
 
         <div class="d-flex align-items-center mb-3 mb-lg-0">
-          <span class="footer-icon">🌱</span>
+          <span class="footer-icon">
+            <Leaf :size="22" :stroke-width="2.2" />
+          </span>
 
           <div>
             <div class="fw-semibold">
@@ -161,6 +166,7 @@ window.addEventListener('auth-changed', updateCurrentUser)
 .navbar {
   padding-top: 14px;
   padding-bottom: 14px;
+  border-bottom: 1px solid #e1ebe3;
 }
 
 .navbar-brand {
@@ -168,8 +174,15 @@ window.addEventListener('auth-changed', updateCurrentUser)
 }
 
 .brand-icon {
-  font-size: 28px;
-  margin-right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-right: 12px;
+  background: #216b45;
+  color: #ffffff;
+  border-radius: 12px;
 }
 
 .brand-name {
@@ -200,8 +213,15 @@ window.addEventListener('auth-changed', updateCurrentUser)
 }
 
 .footer-icon {
-  font-size: 24px;
-  margin-right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-right: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 11px;
 }
 
 .footer-links {
